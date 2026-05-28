@@ -1,4 +1,34 @@
-import { useState } from "react";
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MENTORY</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #101010;
+      color: white;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const { useState } = React;
 
 const contents = [
   {
@@ -84,6 +114,7 @@ const tours = [
 ];
 
 function Header({ page, setPage }) {
+
   const menu = [
     ["팀 소개", "main"],
     ["목차", "contents"],
@@ -94,9 +125,10 @@ function Header({ page, setPage }) {
 
   return (
     <header className="h-auto min-h-[78px] bg-[#24211f] border-b-[3px] border-black flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between px-6 lg:px-10 py-5 lg:py-0">
+
       <button
         onClick={() => setPage("main")}
-        className="text-3xl font-black tracking-[2px] drop-shadow-[4px_4px_0px_#000] text-left"
+        className="text-3xl font-black tracking-[2px]"
       >
         MENTORY
       </button>
@@ -108,7 +140,7 @@ function Header({ page, setPage }) {
             onClick={() => setPage(target)}
             className={
               page === target
-                ? "text-yellow-300 transition"
+                ? "text-yellow-300"
                 : "text-white hover:text-yellow-300 transition"
             }
           >
@@ -123,11 +155,13 @@ function Header({ page, setPage }) {
       >
         지금 시작 〉
       </button>
+
     </header>
   );
 }
 
 function MainPage({ setPage }) {
+
   const members = [
     {
       name: "팀장 : 안성현",
@@ -154,436 +188,270 @@ function MainPage({ setPage }) {
 
   return (
     <main className="grid grid-cols-1 xl:grid-cols-[58%_42%] gap-6 px-5 lg:px-10 py-10 lg:py-16">
+
       <section className="bg-[#24211f] border-4 border-[#3a3a3a] p-5">
-        <div className="h-[320px] lg:h-[530px] bg-gradient-to-br from-blue-500 via-pink-400 to-orange-400 border-2 border-black flex items-center justify-center overflow-hidden relative">
-          <div className="absolute w-[160%] h-[160%] opacity-30 rotate-[15deg] bg-[linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px)] bg-[length:45px_45px]" />
+
+        <div
+          className="h-[320px] lg:h-[530px] border-2 border-black flex items-center justify-center overflow-hidden relative bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(http://www.geobugi.co.kr/user/saveDir/awd/P/0/slideImage_3861_985523.8590630633_0.jpg)",
+          }}
+        >
+
+          <div className="absolute inset-0 bg-black/50"></div>
 
           <div className="relative z-10 text-center">
-            <h1 className="text-5xl lg:text-7xl font-black drop-shadow-[5px_5px_0px_#111]">
+            <h1 className="text-5xl lg:text-7xl font-black">
               MENTORY
             </h1>
+
             <p className="mt-4 text-lg lg:text-2xl font-extrabold bg-black text-yellow-300 px-5 py-2 inline-block">
               MENTOR MATCHING PLATFORM
             </p>
           </div>
+
         </div>
 
         <h1 className="mt-6 text-3xl lg:text-5xl font-black tracking-wide">
           MENTORY: MENTOR & STORY
         </h1>
 
-        <div className="flex flex-wrap gap-6 mt-5 items-center text-gray-300 font-bold">
-          <span className="text-yellow-300 text-2xl">★★★★★</span>
-          <span>(4.8) 12.4K</span>
-          <span>🎓 대학생 추천</span>
-        </div>
-
-        <div className="flex flex-wrap gap-7 mt-7 text-base font-bold">
-          <span>💻 온라인 멘토링</span>
-          <span>🏫 오프라인 가능</span>
-          <span>📱 모바일 지원</span>
-        </div>
       </section>
 
       <aside>
-        <h3 className="text-base mb-5 font-bold">멘토링 팀원 소개</h3>
+
+        <h3 className="text-base mb-5 font-bold">
+          멘토링 팀원 소개
+        </h3>
 
         {members.map((member) => (
+
           <div
             key={member.name}
-            className={
-              member.active
-                ? "bg-[#282523] border-4 border-green-500 p-6 mb-5 relative transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_28px_rgba(128,230,109,.35)] hover:border-yellow-300 cursor-pointer"
-                : "bg-[#282523] border-4 border-[#3c3c3c] p-6 mb-5 transition duration-300 hover:-translate-y-2 hover:border-yellow-300 hover:shadow-[0_0_24px_rgba(255,223,76,.22)] cursor-pointer"
-            }
+            className="bg-[#282523] border-4 border-[#3c3c3c] p-6 mb-5"
           >
-            <h2 className="text-3xl font-medium mb-4 transition group-hover:text-yellow-300">
+
+            <h2 className="text-3xl font-medium mb-4">
               {member.name}
             </h2>
+
             <div className="flex flex-wrap gap-2 mb-5">
+
               {member.tags.map((tag) => (
-                <span key={tag} className="bg-[#151515] px-2 py-1 text-sm font-extrabold">
+                <span
+                  key={tag}
+                  className="bg-[#151515] px-2 py-1 text-sm font-extrabold"
+                >
                   {tag}
                 </span>
               ))}
+
             </div>
-            <div className="border-t-2 border-black my-4" />
-            <div className="text-2xl font-black flex items-center gap-3">
-              <span
-                className={
-                  member.active
-                    ? "w-6 h-6 border-[3px] border-green-300 rounded-full inline-block shadow-[inset_0_0_0_5px_#222,inset_0_0_0_12px_#80e66d]"
-                    : "w-6 h-6 border-[3px] border-white rounded-full inline-block"
-                }
-              />
+
+            <div className="border-t-2 border-black my-4"></div>
+
+            <div className="text-2xl font-black">
               {member.text}
             </div>
+
           </div>
+
         ))}
 
         <div className="grid grid-cols-2 gap-6 mt-4">
+
           <button className="h-16 text-xl font-black bg-[#282523] border-4 border-gray-200">
             🎁 자퇴하기
           </button>
+
           <button
             onClick={() => setPage("contents")}
-            className="h-16 text-xl font-black bg-green-600 border-4 border-green-400 flex items-center justify-center"
+            className="h-16 text-xl font-black bg-green-600 border-4 border-green-400"
           >
             졸업하기 〉
           </button>
+
         </div>
+
       </aside>
+
     </main>
   );
 }
 
 function ContentsPage({ setPage }) {
+
   return (
     <section className="min-h-screen bg-[#101010]">
-      <div className="h-[230px] bg-gradient-to-b from-[#101010] to-[#3b3015] border-b-[24px] border-yellow-400 flex items-center justify-center text-center relative overflow-hidden">
+
+      <div className="h-[230px] bg-gradient-to-b from-[#101010] to-[#3b3015] border-b-[24px] border-yellow-400 flex items-center justify-center text-center">
+
         <div>
-          <h1 className="text-5xl lg:text-6xl font-black tracking-[14px] lg:tracking-[20px] text-yellow-300 mb-6 drop-shadow-[5px_5px_0px_#111]">
+
+          <h1 className="text-5xl lg:text-6xl font-black text-yellow-300 mb-6">
             목 차
           </h1>
-          <p className="text-base lg:text-lg font-black leading-8">
-            Mentory 프로젝트의 핵심 내용을 확인하세요.<br />
-            팀 소개, 아이템, 관광투어, 기대효과를 한눈에 볼 수 있습니다!
-          </p>
-        </div>
-      </div>
 
-      <div className="bg-gradient-to-b from-yellow-200 to-yellow-400 text-black px-5 lg:px-[20%] py-6 font-black">
-        <p>검색</p>
-        <div className="mt-3 h-16 bg-black text-gray-400 border-[3px] border-[#333] flex items-center px-8 text-lg font-black">
-          ⌕ Mentory 목차 검색
+          <p className="text-base lg:text-lg font-black leading-8">
+            Mentory 프로젝트의 핵심 내용을 확인하세요.
+          </p>
+
         </div>
+
       </div>
 
       <div className="px-5 lg:px-10 py-14">
-        <h2 className="text-3xl font-black mb-10 drop-shadow-[3px_3px_0px_#000]">
-          가장 중요한 발표 목차
-        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+
           {contents.map((item) => (
+
             <button
               key={item.title}
               onClick={() => setPage(item.page)}
-              className="text-left block bg-[#2b2927] border-[3px] border-[#3b3b3b] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,76,.22)] min-h-[300px]"
+              className="text-left block bg-[#2b2927] border-[3px] border-[#3b3b3b] p-4"
             >
+
               <div
                 className={`h-[132px] bg-gradient-to-br ${item.color} border-2 border-black mb-4 flex items-center justify-center text-5xl`}
               >
                 {item.icon}
               </div>
-              <h3 className="text-2xl font-black mb-5">{item.title}</h3>
+
+              <h3 className="text-2xl font-black mb-5">
+                {item.title}
+              </h3>
+
               <div className="flex gap-2 flex-wrap mb-6">
+
                 <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
                   {item.tag1}
                 </span>
+
                 <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
                   {item.tag2}
                 </span>
+
               </div>
-              <div className="flex justify-between font-black mt-4">
-                <span>⭐ {item.score}</span>
-                <span className="text-green-400 text-xl">무료</span>
-              </div>
+
             </button>
+
           ))}
+
         </div>
 
-        <button
-          onClick={() => setPage("main")}
-          className="inline-block mt-10 px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-        >
-          〈 메인으로 돌아가기
-        </button>
       </div>
+
     </section>
   );
 }
 
-function ItemPage({ setPage }) {
-  return (
-    <section className="min-h-screen bg-[#111] py-10 lg:py-14">
-      <div className="px-5 lg:px-8 text-sm font-black mb-8">
-        <button onClick={() => setPage("contents")} className="underline">
-          목차
-        </button>
-        <span> 〉 </span>
-        <span>아이템 소개</span>
-        <span> 〉 MENTORY NFC 〉 관광 키링!</span>
-      </div>
+function TourPage() {
 
-      <main className="grid grid-cols-1 xl:grid-cols-[58%_40%] gap-8 px-5 lg:px-8 items-center">
-        <section className="bg-[#222] border-4 border-[#333] p-5">
+  return (
+    <section className="min-h-screen bg-[#111] px-5 lg:px-8 py-14">
+
+      <h1 className="text-5xl font-black text-yellow-300 mb-10">
+        관광 투어
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+        {tours.map((tour) => (
+
           <div
-            className="h-[420px] lg:h-[560px] border-2 border-black bg-cover bg-center flex items-center justify-center relative overflow-hidden"
-            style={{
-              backgroundImage:
-                "url(http://www.geobugi.co.kr/user/saveDir/awd/P/0/slideImage_3861_985523.8590630633_0.jpg)",
-            }}
+            key={tour.title}
+            className="bg-[#2b2927] border-[3px] border-[#3c3c3c] p-4"
           >
-            <div className="absolute inset-0 bg-black/40" />
 
-            <div className="relative z-10 w-[240px] lg:w-[260px] h-[360px] lg:h-[390px] bg-[#151515] border-[8px] border-white rounded-[30px] shadow-[0_0_35px_rgba(255,0,221,.7)] flex flex-col items-center p-8">
-              <h2 className="text-3xl text-yellow-300 font-black mb-5 drop-shadow-[3px_3px_0px_#000]">
-                Mentory
-              </h2>
+            <div
+              className="h-[150px] border-2 border-black mb-4 bg-cover bg-center"
+              style={{ backgroundImage: `url(${tour.image})` }}
+            />
 
-              <div className="w-[140px] h-[140px] rounded-3xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-6xl border-4 border-white mb-6">
-                📱
-              </div>
+            <h3 className="text-2xl mb-4 font-black">
+              {tour.title}
+            </h3>
 
-              <p className="text-center font-black leading-7">
-                NFC 키링을 스마트폰에 태그하면<br />
-                부산 관광 정보와 추천 코스로<br />
-                바로 연결됩니다.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div className="bg-[#2b2927] border-4 border-[#3c3c3c] p-7">
-            <h1 className="text-5xl mb-7 font-medium">아이템 소개!</h1>
-
-            <p className="text-lg mb-5">
-              기준 <span className="underline font-black">Mentory Project</span>
-            </p>
-
-            <div className="border-t-2 border-[#444] my-5" />
-
-            <div className="flex flex-wrap gap-3">
-              <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                🎒 관광 키링
-              </span>
-              <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                📱 NFC 연결
-              </span>
-              <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                🗺️ 부산 투어
-              </span>
-            </div>
-
-            <div className="border-t-2 border-[#444] my-5" />
-
-            <div className="flex justify-between items-center font-black mt-5">
-              <span className="text-yellow-300 text-3xl">무료 체험</span>
-              <span className="text-2xl">약 ₩10000</span>
-            </div>
           </div>
 
-          <button
-            onClick={() => setPage("tour")}
-            className="mt-5 w-full h-14 border-[3px] border-yellow-600 bg-yellow-400 text-black text-xl font-black hover:brightness-110 transition"
-          >
-            관광투어 보러가기 〉
-          </button>
+        ))}
 
-          <div className="mt-6 bg-[#1c1c1c] border-[3px] border-[#333] p-6 leading-8 font-bold text-gray-300">
-            <h2 className="text-yellow-300 text-2xl mb-3 font-black">
-              Mentory NFC 키링이란?
-            </h2>
-            <p>
-              Mentory의 핵심 아이템은 관광객이 키링을 스마트폰에 태그하면 팀 소개,
-              관광 코스, 추천 장소, 굿즈 정보로 바로 이동할 수 있는 NFC 기반 관광
-              안내 아이템입니다.
-            </p>
-          </div>
-        </section>
-      </main>
+      </div>
+
     </section>
   );
 }
 
-function TourPage({ setPage }) {
+function SupportPage() {
+
   return (
-    <section className="min-h-screen bg-[#111]">
-      <div className="min-h-[240px] bg-gradient-to-b from-[#101010] to-[#3d3115] border-b-[22px] border-yellow-400 flex items-center justify-center text-center relative overflow-hidden">
-        <div>
-          <h1 className="text-5xl lg:text-7xl font-black text-yellow-300 tracking-[8px] lg:tracking-[12px] mb-6 drop-shadow-[5px_5px_0px_#111]">
-            관광 투어
-          </h1>
-          <p className="text-base lg:text-lg font-black leading-8">
-            Mentory가 추천하는 부산 인기 관광 코스를 확인하세요.<br />
-            먹거리, 야경, 감성 스팟을 한 번에 즐길 수 있습니다!
-          </p>
-        </div>
-      </div>
+    <section className="min-h-screen bg-[#111] p-10">
 
-      <div className="bg-gradient-to-b from-yellow-200 to-yellow-400 px-5 lg:px-[20%] py-6 text-black font-black">
-        <p>검색</p>
-        <div className="mt-3 h-16 bg-black border-[3px] border-[#333] flex items-center px-7 text-gray-400 text-lg">
-          ⌕ 부산 관광 코스 검색
-        </div>
-      </div>
+      <h1 className="text-5xl font-black text-yellow-300 mb-10">
+        지원 · 협찬
+      </h1>
 
-      <div className="px-5 lg:px-8 py-14">
-        <h2 className="text-3xl font-black mb-10 drop-shadow-[3px_3px_0px_#000]">
-          가장 인기 있는 관광 코스
+      <div className="bg-[#24211f] border-4 border-[#3c3c3c] p-10">
+
+        <h2 className="text-4xl font-black mb-5">
+          거북이 호텔 할인 지원
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {tours.map((tour) => (
-            <div
-              key={tour.title}
-              className="bg-[#2b2927] border-[3px] border-[#3c3c3c] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,78,.2)] cursor-pointer"
-            >
-              <div
-                className="h-[150px] border-2 border-black mb-4 bg-cover bg-center"
-                style={{ backgroundImage: `url(${tour.image})` }}
-              />
-              <h3 className="text-2xl mb-4 font-black">{tour.title}</h3>
-              <div className="flex gap-2 flex-wrap mb-5">
-                <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                  {tour.tag1}
-                </span>
-                <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                  {tour.tag2}
-                </span>
-              </div>
-              <div className="flex justify-between items-center mt-4 font-black">
-                <span>⭐ {tour.score}</span>
-                <span className="text-green-400 text-xl">무료</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={() => setPage("contents")}
-          className="inline-block mt-10 px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-        >
-          〈 목차로 돌아가기
-        </button>
-      </div>
-    </section>
-  );
-}
-
-function SupportPage({ setPage }) {
-  return (
-    <section className="min-h-screen bg-[#111]">
-      <div className="min-h-[240px] bg-gradient-to-b from-[#101010] to-[#3d3115] border-b-[22px] border-yellow-400 flex items-center justify-center text-center px-5">
-        <div>
-          <h1 className="text-5xl lg:text-7xl font-black text-yellow-300 tracking-[8px] lg:tracking-[12px] mb-6 drop-shadow-[5px_5px_0px_#111]">
-            지원 · 협찬
-          </h1>
-          <p className="text-base lg:text-lg font-black leading-8">
-            Mentory 관광 프로젝트는 지역 업체와 함께합니다.<br />
-            관광객에게 더 좋은 경험을 제공하기 위한 협력 혜택을 소개합니다.
-          </p>
-        </div>
-      </div>
-
-      <main className="px-5 lg:px-10 py-14">
-        <div className="grid grid-cols-1 xl:grid-cols-[45%_55%] gap-8 items-stretch">
-          <section className="bg-[#24211f] border-4 border-[#3c3c3c] p-7 flex flex-col justify-between">
-            <div>
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 font-black mb-6">
-                OFFICIAL SUPPORT
-              </div>
-
-              <h2 className="text-4xl lg:text-5xl font-black mb-6 leading-tight">
-                거북이 호텔<br />
-                할인 지원 안내
-              </h2>
-
-              <p className="text-gray-300 font-bold leading-8 text-lg">
-                Mentory 관광투어를 이용하는 방문객에게 거북이 호텔이 숙박 할인 혜택을
-                제공하기로 했습니다. 관광 코스와 숙박을 함께 연결하여 부산 여행을 더
-                편리하게 즐길 수 있도록 돕는 협찬 내용입니다.
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <span className="bg-black border border-[#444] px-4 py-2 font-black">🏨 호텔 할인</span>
-              <span className="bg-black border border-[#444] px-4 py-2 font-black">🤝 지역 협찬</span>
-              <span className="bg-black border border-[#444] px-4 py-2 font-black">🗺️ 부산 관광</span>
-            </div>
-          </section>
-
-          <section className="bg-[#2b2927] border-4 border-[#3c3c3c] p-7">
-            <div className="h-[260px] lg:h-[360px] bg-gradient-to-br from-yellow-300 via-orange-400 to-[#3d3115] border-2 border-black flex items-center justify-center text-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-30 bg-[linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px)] bg-[length:42px_42px] rotate-6 scale-125" />
-              <div className="relative z-10">
-                <div className="text-7xl mb-4">🐢</div>
-                <h3 className="text-5xl font-black drop-shadow-[4px_4px_0px_#000]">
-                  GEOBUGI HOTEL
-                </h3>
-                <p className="mt-4 bg-black text-yellow-300 inline-block px-5 py-2 font-black">
-                  Mentory 제휴 할인 제공
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-7 bg-[#1c1c1c] border-[3px] border-[#333] p-6 leading-8 font-bold text-gray-300">
-              <h3 className="text-yellow-300 text-2xl font-black mb-3">협찬 내용</h3>
-              <p>
-                거북이 호텔은 Mentory 프로젝트와 연계하여 관광객 대상 숙박 할인 혜택을
-                지원합니다. 발표에서는 이 협찬을 통해 관광 코스, 숙박, 지역 상권을 함께
-                연결하는 구조를 보여줄 수 있습니다.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-              <a
-                href="http://www.geobugi.co.kr/"
-                target="_blank"
-                rel="noreferrer"
-                className="h-14 border-[3px] border-yellow-600 bg-yellow-400 text-black text-xl font-black flex items-center justify-center hover:brightness-110 transition"
-              >
-                호텔 홈페이지 보기 〉
-              </a>
-
-              <button
-                onClick={() => setPage("contents")}
-                className="h-14 border-[3px] border-green-500 text-green-400 text-xl font-black hover:bg-green-500 hover:text-black transition"
-              >
-                목차로 돌아가기
-              </button>
-            </div>
-          </section>
-        </div>
-      </main>
-    </section>
-  );
-}
-
-function SimplePage({ title, setPage }) {
-  return (
-    <section className="min-h-screen bg-[#111] flex items-center justify-center px-5 text-center">
-      <div className="bg-[#24211f] border-4 border-[#3c3c3c] p-10 max-w-xl">
-        <h1 className="text-5xl font-black text-yellow-300 mb-6">{title}</h1>
-        <p className="text-gray-300 font-bold leading-8 mb-8">
-          아직 상세 화면은 제작 전입니다. 메뉴 이동 테스트용 화면입니다.
+        <p className="text-gray-300 text-lg leading-8">
+          Mentory 관광 프로젝트는 지역 업체와 함께합니다.
         </p>
-        <button
-          onClick={() => setPage("contents")}
-          className="px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-        >
-          목차로 돌아가기
-        </button>
+
       </div>
+
     </section>
   );
 }
 
-export default function MentoryPreview() {
+function SimplePage({ title }) {
+
+  return (
+    <section className="min-h-screen bg-[#111] flex items-center justify-center">
+
+      <div className="bg-[#24211f] border-4 border-[#3c3c3c] p-10 text-center">
+
+        <h1 className="text-5xl font-black text-yellow-300 mb-6">
+          {title}
+        </h1>
+
+      </div>
+
+    </section>
+  );
+}
+
+function App() {
+
   const [page, setPage] = useState("main");
 
   return (
     <div className="min-h-screen bg-[#101010] text-white font-sans">
+
       <Header page={page} setPage={setPage} />
 
       {page === "main" && <MainPage setPage={setPage} />}
       {page === "contents" && <ContentsPage setPage={setPage} />}
-      {page === "item" && <ItemPage setPage={setPage} />}
-      {page === "tour" && <TourPage setPage={setPage} />}
-      {page === "support" && <SupportPage setPage={setPage} />}
-      {page === "effect" && <SimplePage title="기대효과" setPage={setPage} />}
+      {page === "item" && <MainPage setPage={setPage} />}
+      {page === "tour" && <TourPage />}
+      {page === "support" && <SupportPage />}
+      {page === "effect" && <SimplePage title="기대효과" />}
+
     </div>
   );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <App />
+);
+
+</script>
+
+</body>
+</html>
+```
