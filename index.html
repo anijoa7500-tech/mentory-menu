@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mentory Preview</title>
+  <!-- 깃허브 페이지에서 React와 Tailwind를 빌드 없이 실행하기 위한 CDN 로드 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,8 +12,10 @@
 </head>
 <body class="bg-[#101010]">
 
+  <!-- React가 렌더링될 루트 엘리먼트 -->
   <div id="root"></div>
 
+  <!-- React 및 컴포넌트 소스 코드 (Babel 컴파일) -->
   <script type="text/babel">
     const { useState } = React;
 
@@ -66,38 +69,98 @@
 
     const tours = [
       {
+        id: "haeundae",
         title: "해운대 야경 투어",
         tag1: "야경",
         tag2: "바다",
-        image:
-          "https://www.haeundae.go.kr/user_res/images/culture/heaundae_view/nighView_B_01.jpg",
+        image: "https://www.haeundae.go.kr/user_res/images/culture/heaundae_view/nighView_B_01.jpg",
         score: "4.9",
       },
       {
+        id: "gamcheon",
         title: "감천문화마을 코스",
         tag1: "포토존",
         tag2: "감성",
-        image:
-          "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229142305192_oen",
+        image: "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229142305192_oen",
         score: "4.8",
       },
       {
+        id: "gwanganli",
         title: "광안리 먹거리 투어",
         tag1: "맛집",
         tag2: "광안대교",
-        image:
-          "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229160530047_oen",
+        image: "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229160530047_oen",
         score: "4.7",
       },
       {
+        id: "oncheonjang",
         title: "온천장 힐링 코스",
         tag1: "온천",
         tag2: "휴식",
-        image:
-          "https://i.namu.wiki/i/rnZygoQUZomVCOX52UA2jNY5nhEj8UuD8tW50AJiz86H9Tlj-gHzFTbReM3XwbZA9m0oyhaih1tysESN0w0pag.webp",
+        image: "https://i.namu.wiki/i/rnZygoQUZomVCOX52UA2jNY5nhEj8UuD8tW50AJiz86H9Tlj-gHzFTbReM3XwbZA9m0oyhaih1tysESN0w0pag.webp",
         score: "4.9",
       },
     ];
+
+    // 각 투어별 상세 데이터 (image_ca0a65.jpg 구조 반영: 인기 항목 / 추천 항목 2단 구성)
+    const tourDetails = {
+      haeundae: {
+        mainTitle: "해운대 야경 스페셜",
+        desc: "해운대의 화려한 스카이라인과 밤바다가 어우러진 최고의 야경 명소 컬렉션",
+        popular: [
+          { title: "더베이101", tag: "야경 스팟", type: "인기 장소", price: "무료", img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=500&q=80" },
+          { title: "해운대 해수욕장", tag: "산책로", type: "랜드마크", price: "무료", img: "https://images.unsplash.com/photo-1624008915317-cb3ad69b16ad?w=500&q=80" },
+          { title: "엑스더스카이", tag: "전망대", type: "익스프레스", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1578894381163-e72c17f2d45f?w=500&q=80" }
+        ],
+        recommend: [
+          { title: "해운대 전통시장", tag: "꼼장어/떡볶이", type: "먹거리", price: "추천", img: "https://images.unsplash.com/photo-1534080391025-afb109627460?w=500&q=80" },
+          { title: "미포 미트패킹 클럽", tag: "오션뷰 펍", type: "트렌디", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80" },
+          { title: "해리단길 카페거리", tag: "에스프레소 바", type: "감성카페", price: "인기", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&q=80" }
+        ]
+      },
+      gamcheon: {
+        mainTitle: "감천문화마을 아기자기 탐방",
+        desc: "골목 가득 물든 알록달록한 예술의 향기와 인생샷을 건질 수 있는 스팟",
+        popular: [
+          { title: "어린왕자와 여우", tag: "인생샷 포토존", type: "필수 코스", price: "무료", img: "https://images.unsplash.com/photo-1608889174619-41353f8390ed?w=500&q=80" },
+          { title: "감내카페", tag: "주민협동조합", type: "전망좋은곳", price: "⭐ 4.7", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80" },
+          { title: "하늘마루 전망대", tag: "마을 전체 뷰", type: "전망대", price: "무료", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80" }
+        ],
+        recommend: [
+          { title: "물방울떡 & 씨앗호떡", tag: "이색 길거리 간식", type: "먹거리", price: "인기", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
+          { title: "감천 제빵소", tag: "달벌빵/수제쿠키", type: "베이커리", price: "추천", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&q=80" },
+          { title: "고래사어묵 감천점", tag: "수제어묵 베이커리", type: "원조맛집", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80" }
+        ]
+      },
+      gwanganli: {
+        mainTitle: "광안리 테이스티 로드",
+        desc: "웅장한 광안대교 뷰를 감상하며 즐기는 해산물과 트렌디한 로컬 맛집 투어",
+        popular: [
+          { title: "민락수변공원", tag: "야외 회센터", type: "핫플레이스", price: "무료", img: "https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=500&q=80" },
+          { title: "광안리 드론쇼 명당", tag: "백사장 중앙", type: "매주 토요일", price: "무료", img: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=500&q=80" },
+          { title: "민락더마켓", tag: "복합문화공간", type: "트렌디", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80" }
+        ],
+        recommend: [
+          { title: "광안리 언양불고기", tag: "줄서서 먹는 노포", type: "고기맛집", price: "추천", img: "https://images.unsplash.com/photo-1606471191009-63994c53433b?w=500&q=80" },
+          { title: "초필살돼지구이", tag: "인생 껍데기 전문", type: "SNS 화제", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80" },
+          { title: "밀락더버거", tag: "수제 크리스피 버거", type: "인스타 감성", price: "인기", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80" }
+        ]
+      },
+      oncheonjang: {
+        mainTitle: "온천장 레트로 힐링웰니스",
+        desc: "유서 깊은 천연 온천수 목욕 후 즐기는 백년가게와 숨겨진 맛집 골목 산책",
+        popular: [
+          { title: "허심청", tag: "동양 최대 온천 시설", type: "천연 온천수", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&q=80" },
+          { title: "금강공원 케이블카", tag: "금정산 절경 감상", type: "레트로 힐링", price: "인기", img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&q=80" },
+          { title: "온천천 시민공원", tag: "벚꽃&유채꽃길", type: "산책 명소", price: "무료", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=500&q=80" }
+        ],
+        recommend: [
+          { title: "동래할매파전", tag: "4대째 이어온 백년가게", type: "필수 먹거리", price: "전통추천", img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80" },
+          { title: "소문난주문진막국수", tag: "수육과 막국수 콤보", type: "최고의 로컬", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500&q=80" },
+          { title: "모모스커피 본점", tag: "월드 바리스타 챔피언", type: "스페셜티", price: "강력추천", img: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&q=80" }
+        ]
+      }
+    };
 
     function Header({ page, setPage }) {
       const menu = [
@@ -123,7 +186,7 @@
                 key={target}
                 onClick={() => setPage(target)}
                 className={
-                  page === target
+                  page.startsWith(target)
                     ? "text-yellow-300 transition"
                     : "text-white hover:text-yellow-300 transition"
                 }
@@ -445,7 +508,8 @@
               {tours.map((tour) => (
                 <div
                   key={tour.title}
-                  className="bg-[#2b2927] border-[3px] border-[#3c3c3c] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,78,.2)] cursor-pointer"
+                  onClick={() => setPage(`tour-${tour.id}`)}
+                  className="bg-[#2b2927] border-[3px] border-[#3c3c3c] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,76,.2)] cursor-pointer"
                 >
                   <div
                     className="h-[150px] border-2 border-black mb-4 bg-cover bg-center"
@@ -473,6 +537,110 @@
               className="inline-block mt-10 px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
             >
               〈 목차로 돌아가기
+            </button>
+          </div>
+        </section>
+      );
+    }
+
+    // image_ca0a65.jpg 마인크래프트 마켓플레이스 UI 컨셉 레이아웃 구현 상세화면 컴포넌트
+    function TourDetailPage({ tourId, setPage }) {
+      const detail = tourDetails[tourId];
+
+      if (!detail) {
+        return (
+          <div className="min-h-screen bg-[#111] flex items-center justify-center text-white">
+            <p className="font-black text-xl">존재하지 않는 코스입니다.</p>
+          </div>
+        );
+      }
+
+      return (
+        <section className="min-h-screen bg-[#141414] text-white px-5 lg:px-12 py-10 font-sans">
+          {/* 상단 Breadcrumb & 뒤로가기 */}
+          <div className="text-sm font-bold text-gray-400 mb-8 flex items-center gap-2">
+            <button onClick={() => setPage("tour")} className="hover:underline text-yellow-300">관광투어</button>
+            <span> 〉 </span>
+            <span className="text-white">{detail.mainTitle}</span>
+          </div>
+
+          <div className="mb-12">
+            <h1 className="text-4xl lg:text-5xl font-black text-yellow-300 mb-4 drop-shadow-[2px_2px_0px_#000]">
+              {detail.mainTitle}
+            </h1>
+            <p className="text-gray-400 text-lg font-bold">{detail.desc}</p>
+          </div>
+
+          {/* 1단 섹션: 현재 마켓 인기 항목 구조 구현 */}
+          <div className="mb-14">
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-2 text-white">
+              <span className="text-yellow-400">🔥</span> 지금 가장 핫한 필수 명소
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {detail.popular.map((item, idx) => (
+                <div key={idx} className="bg-[#1f1e1d] border-2 border-[#2d2c2a] rounded-sm p-4 transition hover:scale-[1.02] hover:border-yellow-400">
+                  <div 
+                    className="h-[180px] bg-cover bg-center border border-black rounded-sm mb-4"
+                    style={{ backgroundImage: `url(${item.img})` }}
+                  />
+                  <h3 className="text-xl font-black mb-2 text-white truncate">{item.title}</h3>
+                  <div className="inline-block bg-[#111] text-gray-400 border border-[#333] px-2 py-1 text-xs font-bold mb-4">
+                    👤 {item.tag}
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-[#2e2d2b]">
+                    <span className="text-xs text-gray-400 font-bold">{item.type}</span>
+                    <span className="bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-sm">
+                      {item.price}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2단 섹션: image_ca0a65.jpg 하단 "추천 항목" 그리드 구조 완벽 복사 */}
+          <div className="mb-10">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <span className="text-orange-400">🍕</span> 유행 및 추천 먹거리 스팟
+              </h2>
+              <span className="text-gray-500 text-2xl font-black">←</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {detail.recommend.map((item, idx) => (
+                <div key={idx} className="bg-[#1f1e1d] border-2 border-[#2d2c2a] rounded-sm p-4 transition hover:scale-[1.02] hover:border-yellow-400">
+                  <div 
+                    className="h-[180px] bg-cover bg-center border border-black rounded-sm mb-4"
+                    style={{ backgroundImage: `url(${item.img})` }}
+                  />
+                  <h3 className="text-xl font-black mb-2 text-white truncate">{item.title}</h3>
+                  <div className="inline-block bg-[#111] text-gray-400 border border-[#333] px-2 py-1 text-xs font-bold mb-4">
+                    🏃 {item.tag}
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-[#2e2d2b]">
+                    <span className="text-xs text-gray-400 font-bold">{item.type}</span>
+                    <span className="bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-sm">
+                      {item.price}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 하단 제어 단추 */}
+          <div className="mt-12 pt-6 border-t border-[#2d2c2a] flex gap-4">
+            <button
+              onClick={() => setPage("tour")}
+              className="px-6 py-3 border-[3px] border-yellow-500 text-yellow-400 font-black hover:bg-yellow-500 hover:text-black transition"
+            >
+              〈 목록으로 가기
+            </button>
+            <button
+              onClick={() => setPage("contents")}
+              className="px-6 py-3 border-[3px] border-green-500 text-green-400 font-black hover:bg-green-500 hover:text-black transition"
+            >
+              목차로 이동
             </button>
           </div>
         </section>
@@ -600,11 +768,17 @@
           {page === "tour" && <TourPage setPage={setPage} />}
           {page === "support" && <SupportPage setPage={setPage} />}
           {page === "effect" && <SimplePage title="기대효과" setPage={setPage} />}
+          
+          {/* 하위 상세 페이지 라우팅 분기 처리 */}
+          {page === "tour-haeundae" && <TourDetailPage tourId="haeundae" setPage={setPage} />}
+          {page === "tour-gamcheon" && <TourDetailPage tourId="gamcheon" setPage={setPage} />}
+          {page === "tour-gwanganli" && <TourDetailPage tourId="gwanganli" setPage={setPage} />}
+          {page === "tour-oncheonjang" && <TourDetailPage tourId="oncheonjang" setPage={setPage} />}
         </div>
       );
     }
 
-    // React 18 전용 렌더링 방식 적용
+    // React 18 렌더링 적용
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<MentoryPreview />);
   </script>
