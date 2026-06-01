@@ -1,786 +1,264 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mentory Preview</title>
-  <!-- 깃허브 페이지에서 React와 Tailwind를 빌드 없이 실행하기 위한 CDN 로드 -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BUFS Campus Hub</title>
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=1ee1cf6aa1ebfffa368238d875d03b32&autoload=false"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    .badge { display: inline-block; background: #facc15; color: #000; padding: 7px 13px; border-radius: 999px; font-weight: 900; font-size: 13px; margin-bottom: 10px; }
+    h1 { font-size: 42px; margin: 0; letter-spacing: -1.5px; }
+    .sub { color: #64748b; margin: 8px 0 0; }
+    .status { color: #a16207; font-size: 13px; font-weight: 800; margin-top: 6px; }
+    button { cursor: pointer; }
+    .refresh { background: #facc15; color: #000; border: 0; border-radius: 16px; padding: 12px 16px; font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
+    .side { display: flex; flex-direction: column; gap: 10px; }
+    .menu { border: 1px solid #e2e8f0; background: #fff; border-radius: 22px; padding: 14px; text-align: left; box-shadow: 0 4px 10px rgba(15,23,42,.04); }
+    .menu.active { background: #facc15; border-color: #facc15; }
+    .menu-top { display: flex; gap: 12px; align-items: center; }
+    .icon { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #fef3c7; font-size: 23px; }
+    .menu.active .icon { background: #111827; color: #facc15; }
+    .menu-title { font-weight: 950; }
+    .menu-desc { color: #64748b; font-size: 13px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 24px; padding: 18px; box-shadow: 0 4px 12px rgba(15,23,42,.04); }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 18px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 18px; }
+    .yellow { background: #facc15; color: #000; border: 0; }
+    .small { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px; padding: 14px; }
+    #map { height: 520px; border-radius: 24px; overflow: hidden; background: #e2e8f0; }
+    .bus-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 18px; }
+    .pill { border-radius: 999px; padding: 5px 10px; font-weight: 900; font-size: 13px; display: inline-block; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    input { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px; padding: 10px 12px; outline: none; }
+    .hidden { display: none; }
+    @media (max-width: 900px) {
+      .layout, .bus-layout, .grid2, .grid3 { grid-template-columns: 1fr; }
+      h1 { font-size: 34px; }
+    }
+  </style>
 </head>
-<body class="bg-[#101010]">
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="badge">📡 부산외대 캠퍼스 생활 플랫폼</div>
+        <h1>BUFS Campus Hub</h1>
+        <p class="sub">버스, 시간표, 학식, 게시판을 한 번에 확인하는 학생용 웹사이트</p>
+        <p id="status" class="status">카카오맵 가능 버전 · API 연결 전에는 예시 데이터 표시</p>
+      </div>
+      <button class="refresh" onclick="loadBusData()">↻ 새로고침</button>
+    </header>
 
-  <!-- React가 렌더링될 루트 엘리먼트 -->
-  <div id="root"></div>
+    <section class="layout">
+      <aside class="side" id="menu"></aside>
+      <main id="content"></main>
+    </section>
+  </div>
 
-  <!-- React 및 컴포넌트 소스 코드 (Babel 컴파일) -->
-  <script type="text/babel">
-    const { useState } = React;
+  <script>
+    const BUSAN_API_KEY = "3236d3a3cc4eca8b1a29348b32335181fa3ce87ef6394bc3a85ede3d363f827e";
+    const BUSAN_API_URL = "https://api.odcloud.kr/api/3070497/v1/uddi:5d92f49f-063c-4399-a9b2-e8cb662f239e";
+    const TARGET_BUS_NAME = "금정3";
 
-    const contents = [
-      {
-        icon: "👥",
-        title: "1. 팀 소개",
-        tag1: "멘토리",
-        tag2: "팀원",
-        page: "main",
-        color: "from-blue-500 to-green-400",
-        score: "4.9",
-      },
-      {
-        icon: "💡",
-        title: "2. 아이템 소개",
-        tag1: "NFC",
-        tag2: "관광",
-        page: "item",
-        color: "from-purple-700 to-pink-400",
-        score: "4.8",
-      },
-      {
-        icon: "🗺️",
-        title: "3. 관광투어",
-        tag1: "부산",
-        tag2: "코스",
-        page: "tour",
-        color: "from-black to-yellow-500",
-        score: "4.7",
-      },
-      {
-        icon: "🎁",
-        title: "4. 협찬",
-        tag1: "투숙",
-        tag2: "할인",
-        page: "support",
-        color: "from-purple-700 to-blue-500",
-        score: "4.6",
-      },
-      {
-        icon: "🚀",
-        title: "5. 기대효과",
-        tag1: "발전",
-        tag2: "확장",
-        page: "effect",
-        color: "from-orange-500 to-yellow-300",
-        score: "4.9",
-      },
+    const menus = [
+      ["home", "🏠", "홈", "전체 요약 보기"],
+      ["bus", "🚌", "실시간 버스", "금정 3번 위치·혼잡도"],
+      ["timetable", "📅", "학교 시간표", "다음 수업 확인"],
+      ["food", "🍚", "오늘의 학식", "메뉴·가격·운영시간"],
+      ["board", "📢", "게시판", "자유·분실물·중고거래"],
+      ["notice", "🏫", "학교 정보", "공지·학사·장학"],
+      ["around", "☕", "주변 정보", "맛집·카페·알바"]
     ];
 
-    const tours = [
-      {
-        id: "haeundae",
-        title: "해운대 야경 투어",
-        tag1: "야경",
-        tag2: "바다",
-        image: "https://www.haeundae.go.kr/user_res/images/culture/heaundae_view/nighView_B_01.jpg",
-        score: "4.9",
-      },
-      {
-        id: "gamcheon",
-        title: "감천문화마을 코스",
-        tag1: "포토존",
-        tag2: "감성",
-        image: "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229142305192_oen",
-        score: "4.8",
-      },
-      {
-        id: "gwanganli",
-        title: "광안리 먹거리 투어",
-        tag1: "맛집",
-        tag2: "광안대교",
-        image: "https://www.visitbusan.net/uploadImgs/files/cntnts/20191229160530047_oen",
-        score: "4.7",
-      },
-      {
-        id: "oncheonjang",
-        title: "온천장 힐링 코스",
-        tag1: "온천",
-        tag2: "휴식",
-        image: "https://i.namu.wiki/i/rnZygoQUZomVCOX52UA2jNY5nhEj8UuD8tW50AJiz86H9Tlj-gHzFTbReM3XwbZA9m0oyhaih1tysESN0w0pag.webp",
-        score: "4.9",
-      },
+    const fallbackStops = [
+      { name: "부산외국어대학교", eta: 3, crowdBase: 82, lat: 35.2675, lng: 129.0903 },
+      { name: "남산역", eta: 6, crowdBase: 68, lat: 35.2652, lng: 129.0929 },
+      { name: "구서역", eta: 10, crowdBase: 56, lat: 35.2471, lng: 129.0914 },
+      { name: "금정구청", eta: 14, crowdBase: 73, lat: 35.2429, lng: 129.0922 },
+      { name: "장전역", eta: 19, crowdBase: 62, lat: 35.2381, lng: 129.0881 }
     ];
 
-    // 각 투어별 상세 데이터 (image_ca0a65.jpg 구조 반영: 인기 항목 / 추천 항목 2단 구성)
-    const tourDetails = {
-      haeundae: {
-        mainTitle: "해운대 야경 스페셜",
-        desc: "해운대의 화려한 스카이라인과 밤바다가 어우러진 최고의 야경 명소 컬렉션",
-        popular: [
-          { title: "더베이101", tag: "야경 스팟", type: "인기 장소", price: "무료", img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=500&q=80" },
-          { title: "해운대 해수욕장", tag: "산책로", type: "랜드마크", price: "무료", img: "https://images.unsplash.com/photo-1624008915317-cb3ad69b16ad?w=500&q=80" },
-          { title: "엑스더스카이", tag: "전망대", type: "익스프레스", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1578894381163-e72c17f2d45f?w=500&q=80" }
-        ],
-        recommend: [
-          { title: "해운대 전통시장", tag: "꼼장어/떡볶이", type: "먹거리", price: "추천", img: "https://images.unsplash.com/photo-1534080391025-afb109627460?w=500&q=80" },
-          { title: "미포 미트패킹 클럽", tag: "오션뷰 펍", type: "트렌디", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80" },
-          { title: "해리단길 카페거리", tag: "에스프레소 바", type: "감성카페", price: "인기", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&q=80" }
-        ]
-      },
-      gamcheon: {
-        mainTitle: "감천문화마을 아기자기 탐방",
-        desc: "골목 가득 물든 알록달록한 예술의 향기와 인생샷을 건질 수 있는 스팟",
-        popular: [
-          { title: "어린왕자와 여우", tag: "인생샷 포토존", type: "필수 코스", price: "무료", img: "https://images.unsplash.com/photo-1608889174619-41353f8390ed?w=500&q=80" },
-          { title: "감내카페", tag: "주민협동조합", type: "전망좋은곳", price: "⭐ 4.7", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80" },
-          { title: "하늘마루 전망대", tag: "마을 전체 뷰", type: "전망대", price: "무료", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80" }
-        ],
-        recommend: [
-          { title: "물방울떡 & 씨앗호떡", tag: "이색 길거리 간식", type: "먹거리", price: "인기", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
-          { title: "감천 제빵소", tag: "달벌빵/수제쿠키", type: "베이커리", price: "추천", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&q=80" },
-          { title: "고래사어묵 감천점", tag: "수제어묵 베이커리", type: "원조맛집", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80" }
-        ]
-      },
-      gwanganli: {
-        mainTitle: "광안리 테이스티 로드",
-        desc: "웅장한 광안대교 뷰를 감상하며 즐기는 해산물과 트렌디한 로컬 맛집 투어",
-        popular: [
-          { title: "민락수변공원", tag: "야외 회센터", type: "핫플레이스", price: "무료", img: "https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=500&q=80" },
-          { title: "광안리 드론쇼 명당", tag: "백사장 중앙", type: "매주 토요일", price: "무료", img: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=500&q=80" },
-          { title: "민락더마켓", tag: "복합문화공간", type: "트렌디", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80" }
-        ],
-        recommend: [
-          { title: "광안리 언양불고기", tag: "줄서서 먹는 노포", type: "고기맛집", price: "추천", img: "https://images.unsplash.com/photo-1606471191009-63994c53433b?w=500&q=80" },
-          { title: "초필살돼지구이", tag: "인생 껍데기 전문", type: "SNS 화제", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80" },
-          { title: "밀락더버거", tag: "수제 크리스피 버거", type: "인스타 감성", price: "인기", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80" }
-        ]
-      },
-      oncheonjang: {
-        mainTitle: "온천장 레트로 힐링웰니스",
-        desc: "유서 깊은 천연 온천수 목욕 후 즐기는 백년가게와 숨겨진 맛집 골목 산책",
-        popular: [
-          { title: "허심청", tag: "동양 최대 온천 시설", type: "천연 온천수", price: "⭐ 4.9", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&q=80" },
-          { title: "금강공원 케이블카", tag: "금정산 절경 감상", type: "레트로 힐링", price: "인기", img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&q=80" },
-          { title: "온천천 시민공원", tag: "벚꽃&유채꽃길", type: "산책 명소", price: "무료", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=500&q=80" }
-        ],
-        recommend: [
-          { title: "동래할매파전", tag: "4대째 이어온 백년가게", type: "필수 먹거리", price: "전통추천", img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80" },
-          { title: "소문난주문진막국수", tag: "수육과 막국수 콤보", type: "최고의 로컬", price: "⭐ 4.8", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500&q=80" },
-          { title: "모모스커피 본점", tag: "월드 바리스타 챔피언", type: "스페셜티", price: "강력추천", img: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&q=80" }
-        ]
+    const fallbackBuses = [
+      { id: "금정3-1", status: "운행중", next: "부산외국어대학교", eta: 3, crowd: 78, lat: 35.2668, lng: 129.0910 },
+      { id: "금정3-2", status: "운행중", next: "구서역", eta: 10, crowd: 54, lat: 35.2483, lng: 129.0919 },
+      { id: "금정3-3", status: "회차 대기", next: "장전역", eta: 19, crowd: 31, lat: 35.2384, lng: 129.0884 }
+    ];
+
+    let tab = "home";
+    let stops = [...fallbackStops];
+    let buses = [...fallbackBuses];
+    let selectedBus = buses[0];
+    let kakaoMap = null;
+    let overlays = [];
+
+    function crowd(v) {
+      if (v >= 75) return { text: "혼잡", color: "#ef4444", bg: "#fee2e2" };
+      if (v >= 45) return { text: "보통", color: "#ca8a04", bg: "#fef3c7" };
+      return { text: "여유", color: "#16a34a", bg: "#dcfce7" };
+    }
+    function estimateCrowdByTime() {
+      const h = new Date().getHours();
+      if ((h >= 7 && h <= 9) || (h >= 17 && h <= 19)) return 82;
+      if ((h >= 11 && h <= 16)) return 58;
+      return 32;
+    }
+    function pick(obj, keys) {
+      for (const k of keys) {
+        if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "") return String(obj[k]).trim();
       }
-    };
-
-    function Header({ page, setPage }) {
-      const menu = [
-        ["팀 소개", "main"],
-        ["목차", "contents"],
-        ["아이템", "item"],
-        ["관광투어", "tour"],
-        ["지원", "support"],
-      ];
-
-      return (
-        <header className="h-auto min-h-[78px] bg-[#24211f] border-b-[3px] border-black flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between px-6 lg:px-10 py-5 lg:py-0 text-white">
-          <button
-            onClick={() => setPage("main")}
-            className="text-3xl font-black tracking-[2px] drop-shadow-[4px_4px_0px_#000] text-left"
-          >
-            MENTORY
-          </button>
-
-          <nav className="flex flex-wrap gap-5 lg:gap-10 text-sm font-bold">
-            {menu.map(([name, target]) => (
-              <button
-                key={target}
-                onClick={() => setPage(target)}
-                className={
-                  page.startsWith(target)
-                    ? "text-yellow-300 transition"
-                    : "text-white hover:text-yellow-300 transition"
-                }
-              >
-                {name}
-              </button>
-            ))}
-          </nav>
-
-          <button
-            onClick={() => setPage("contents")}
-            className="border-2 border-green-500 text-green-400 px-6 py-3 font-extrabold hover:bg-green-500 hover:text-black transition"
-          >
-            지금 시작 〉
-          </button>
-        </header>
-      );
+      return "";
+    }
+    function isGeumjeong3(row) {
+      const route = pick(row, ["노선명", "노선번호", "노선", "마을버스", "버스노선", "route", "routeName"]);
+      return route.replace(/\s/g, "").includes(TARGET_BUS_NAME);
     }
 
-    function MainPage({ setPage }) {
-      const members = [
-        {
-          name: "팀장 : 안성현",
-          tags: ["사이버경찰학과", "국제마케팅학과", "일본어"],
-          text: "자유롭게 살자",
-          active: true,
-        },
-        {
-          name: "추민성",
-          tags: ["글로벌자율전공", "일본어학과", "중고 신입생"],
-          text: "빨리 취직하고 싶다",
-        },
-        {
-          name: "최연주",
-          tags: ["항공서비스학과", "신입생"],
-          text: "항서과 최고",
-        },
-        {
-          name: "최유빈",
-          tags: ["항공서비스학과", "신입생"],
-          text: "고기 먹고 싶다",
-        },
-      ];
-
-      return (
-        <main className="grid grid-cols-1 xl:grid-cols-[58%_42%] gap-6 px-5 lg:px-10 py-10 lg:py-16 text-white">
-          <section className="bg-[#24211f] border-4 border-[#3a3a3a] p-5">
-            <div className="h-[320px] lg:h-[530px] bg-gradient-to-br from-blue-500 via-pink-400 to-orange-400 border-2 border-black flex items-center justify-center overflow-hidden relative">
-              <div className="absolute w-[160%] h-[160%] opacity-30 rotate-[15deg] bg-[linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px)] bg-[length:45px_45px]" />
-
-              <div className="relative z-10 text-center">
-                <h1 className="text-5xl lg:text-7xl font-black drop-shadow-[5px_5px_0px_#111]">
-                  MENTORY
-                </h1>
-                <p className="mt-4 text-lg lg:text-2xl font-extrabold bg-black text-yellow-300 px-5 py-2 inline-block">
-                  MENTOR MATCHING PLATFORM
-                </p>
-              </div>
-            </div>
-
-            <h1 className="mt-6 text-3xl lg:text-5xl font-black tracking-wide">
-              MENTORY: MENTOR & STORY
-            </h1>
-
-            <div className="flex flex-wrap gap-6 mt-5 items-center text-gray-300 font-bold">
-              <span className="text-yellow-300 text-2xl">★★★★★</span>
-              <span>(4.8) 12.4K</span>
-              <span>🎓 대학생 추천</span>
-            </div>
-
-            <div className="flex flex-wrap gap-7 mt-7 text-base font-bold">
-              <span>💻 온라인 멘토링</span>
-              <span>🏫 오프라인 가능</span>
-              <span>📱 모바일 지원</span>
-            </div>
-          </section>
-
-          <aside>
-            <h3 className="text-base mb-5 font-bold">멘토링 팀원 소개</h3>
-
-            {members.map((member) => (
-              <div
-                key={member.name}
-                className={
-                  member.active
-                    ? "bg-[#282523] border-4 border-green-500 p-6 mb-5 relative transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_28px_rgba(128,230,109,.35)] hover:border-yellow-300 cursor-pointer"
-                    : "bg-[#282523] border-4 border-[#3c3c3c] p-6 mb-5 transition duration-300 hover:-translate-y-2 hover:border-yellow-300 hover:shadow-[0_0_24px_rgba(255,223,76,.22)] cursor-pointer"
-                }
-              >
-                <h2 className="text-3xl font-medium mb-4 transition group-hover:text-yellow-300">
-                  {member.name}
-                </h2>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {member.tags.map((tag) => (
-                    <span key={tag} className="bg-[#151515] px-2 py-1 text-sm font-extrabold">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="border-t-2 border-black my-4" />
-                <div className="text-2xl font-black flex items-center gap-3">
-                  <span
-                    className={
-                      member.active
-                        ? "w-6 h-6 border-[3px] border-green-300 rounded-full inline-block shadow-[inset_0_0_0_5px_#222,inset_0_0_0_12px_#80e66d]"
-                        : "w-6 h-6 border-[3px] border-white rounded-full inline-block"
-                    }
-                  />
-                  {member.text}
-                </div>
-              </div>
-            ))}
-
-            <div className="grid grid-cols-2 gap-6 mt-4">
-              <button className="h-16 text-xl font-black bg-[#282523] border-4 border-gray-200">
-                🎁 자퇴하기
-              </button>
-              <button
-                onClick={() => setPage("contents")}
-                className="h-16 text-xl font-black bg-green-600 border-4 border-green-400 flex items-center justify-center"
-              >
-                졸업하기 〉
-              </button>
-            </div>
-          </aside>
-        </main>
-      );
+    function setStatus(msg) {
+      document.getElementById("status").textContent = msg;
     }
 
-    function ContentsPage({ setPage }) {
-      return (
-        <section className="min-h-screen bg-[#101010] text-white">
-          <div className="h-[230px] bg-gradient-to-b from-[#101010] to-[#3b3015] border-b-[24px] border-yellow-400 flex items-center justify-center text-center relative overflow-hidden">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-black tracking-[14px] lg:tracking-[20px] text-yellow-300 mb-6 drop-shadow-[5px_5px_0px_#111]">
-                목 차
-              </h1>
-              <p className="text-base lg:text-lg font-black leading-8">
-                Mentory 프로젝트의 핵심 내용을 확인하세요.<br />
-                팀 소개, 아이템, 관광투어, 기대효과를 한눈에 볼 수 있습니다!
-              </p>
+    function renderMenu() {
+      document.getElementById("menu").innerHTML = menus.map(m => `
+        <button class="menu ${tab === m[0] ? "active" : ""}" onclick="setTab('${m[0]}')">
+          <div class="menu-top">
+            <div class="icon">${m[1]}</div>
+            <div style="flex:1">
+              <div class="menu-title">${m[2]}</div>
+              <div class="menu-desc">${m[3]}</div>
             </div>
+            <b>›</b>
           </div>
-
-          <div className="bg-gradient-to-b from-yellow-200 to-yellow-400 text-black px-5 lg:px-[20%] py-6 font-black">
-            <p>검색</p>
-            <div className="mt-3 h-16 bg-black text-gray-400 border-[3px] border-[#333] flex items-center px-8 text-lg font-black">
-              ⌕ Mentory 목차 검색
-            </div>
-          </div>
-
-          <div className="px-5 lg:px-10 py-14">
-            <h2 className="text-3xl font-black mb-10 drop-shadow-[3px_3px_0px_#000]">
-              가장 중요한 발표 목차
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-              {contents.map((item) => (
-                <button
-                  key={item.title}
-                  onClick={() => setPage(item.page)}
-                  className="text-left block bg-[#2b2927] border-[3px] border-[#3b3b3b] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,76,.22)] min-h-[300px]"
-                >
-                  <div
-                    className={`h-[132px] bg-gradient-to-br ${item.color} border-2 border-black mb-4 flex items-center justify-center text-5xl`}
-                  >
-                    {item.icon}
-                  </div>
-                  <h3 className="text-2xl font-black mb-5">{item.title}</h3>
-                  <div className="flex gap-2 flex-wrap mb-6">
-                    <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                      {item.tag1}
-                    </span>
-                    <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                      {item.tag2}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-black mt-4">
-                    <span>⭐ {item.score}</span>
-                    <span className="text-green-400 text-xl">무료</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setPage("main")}
-              className="inline-block mt-10 px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-            >
-              〈 메인으로 돌아가기
-            </button>
-          </div>
-        </section>
-      );
+        </button>
+      `).join("");
     }
 
-    function ItemPage({ setPage }) {
-      return (
-        <section className="min-h-screen bg-[#111] py-10 lg:py-14 text-white">
-          <div className="px-5 lg:px-8 text-sm font-black mb-8">
-            <button onClick={() => setPage("contents")} className="underline">
-              목차
-            </button>
-            <span> 〉 </span>
-            <span>아이템 소개</span>
-            <span> 〉 MENTORY NFC 〉 관광 키링!</span>
-          </div>
-
-          <main className="grid grid-cols-1 xl:grid-cols-[58%_40%] gap-8 px-5 lg:px-8 items-center">
-            <section className="bg-[#222] border-4 border-[#333] p-5">
-              <div
-                className="h-[420px] lg:h-[560px] border-2 border-black bg-cover bg-center flex items-center justify-center relative overflow-hidden"
-                style={{
-                  backgroundImage:
-                    "url(http://www.geobugi.co.kr/user/saveDir/awd/P/0/slideImage_3861_985523.8590630633_0.jpg)",
-                }}
-              >
-                <div className="absolute inset-0 bg-black/40" />
-
-                <div className="relative z-10 w-[240px] lg:w-[260px] h-[360px] lg:h-[390px] bg-[#151515] border-[8px] border-white rounded-[30px] shadow-[0_0_35px_rgba(255,0,221,.7)] flex flex-col items-center p-8">
-                  <h2 className="text-3xl text-yellow-300 font-black mb-5 drop-shadow-[3px_3px_0px_#000]">
-                    Mentory
-                  </h2>
-
-                  <div className="w-[140px] h-[140px] rounded-3xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-6xl border-4 border-white mb-6">
-                    📱
-                  </div>
-
-                  <p className="text-center font-black leading-7">
-                    NFC 키링을 스마트폰에 태그하면<br />
-                    부산 관광 정보와 추천 코스로<br />
-                    바로 연결됩니다.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <div className="bg-[#2b2927] border-4 border-[#3c3c3c] p-7">
-                <h1 className="text-5xl mb-7 font-medium">아이템 소개!</h1>
-
-                <p className="text-lg mb-5">
-                  기준 <span className="underline font-black">Mentory Project</span>
-                </p>
-
-                <div className="border-t-2 border-[#444] my-5" />
-
-                <div className="flex flex-wrap gap-3">
-                  <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                    🎒 관광 키링
-                  </span>
-                  <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                    📱 NFC 연결
-                  </span>
-                  <span className="bg-black border border-[#444] px-3 py-2 font-black">
-                    🗺️ 부산 투어
-                  </span>
-                </div>
-
-                <div className="border-t-2 border-[#444] my-5" />
-
-                <div className="flex justify-between items-center font-black mt-5">
-                  <span className="text-yellow-300 text-3xl">무료 체험</span>
-                  <span className="text-2xl">약 ₩10000</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setPage("tour")}
-                className="mt-5 w-full h-14 border-[3px] border-yellow-600 bg-yellow-400 text-black text-xl font-black hover:brightness-110 transition"
-              >
-                관광투어 보러가기 〉
-              </button>
-
-              <div className="mt-6 bg-[#1c1c1c] border-[3px] border-[#333] p-6 leading-8 font-bold text-gray-300">
-                <h2 className="text-yellow-300 text-2xl mb-3 font-black">
-                  Mentory NFC 키링이란?
-                </h2>
-                <p>
-                  Mentory의 핵심 아이템은 관광객이 키링을 스마트폰에 태그하면 팀 소개,
-                  관광 코스, 추천 장소, 굿즈 정보로 바로 이동할 수 있는 NFC 기반 관광
-                  안내 아이템입니다.
-                </p>
-              </div>
-            </section>
-          </main>
-        </section>
-      );
+    function setTab(t) {
+      tab = t;
+      render();
     }
 
-    function TourPage({ setPage }) {
-      return (
-        <section className="min-h-screen bg-[#111] text-white">
-          <div className="min-h-[240px] bg-gradient-to-b from-[#101010] to-[#3d3115] border-b-[22px] border-yellow-400 flex items-center justify-center text-center relative overflow-hidden">
-            <div>
-              <h1 className="text-5xl lg:text-7xl font-black text-yellow-300 tracking-[8px] lg:tracking-[12px] mb-6 drop-shadow-[5px_5px_0px_#111]">
-                관광 투어
-              </h1>
-              <p className="text-base lg:text-lg font-black leading-8">
-                Mentory가 추천하는 부산 인기 관광 코스를 확인하세요.<br />
-                먹거리, 야경, 감성 스팟을 한 번에 즐길 수 있습니다!
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-b from-yellow-200 to-yellow-400 px-5 lg:px-[20%] py-6 text-black font-black">
-            <p>검색</p>
-            <div className="mt-3 h-16 bg-black border-[3px] border-[#333] flex items-center px-7 text-gray-400 text-lg">
-              ⌕ 부산 관광 코스 검색
-            </div>
-          </div>
-
-          <div className="px-5 lg:px-8 py-14">
-            <h2 className="text-3xl font-black mb-10 drop-shadow-[3px_3px_0px_#000]">
-              가장 인기 있는 관광 코스
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-              {tours.map((tour) => (
-                <div
-                  key={tour.title}
-                  onClick={() => setPage(`tour-${tour.id}`)}
-                  className="bg-[#2b2927] border-[3px] border-[#3c3c3c] p-4 hover:-translate-y-2 transition hover:border-yellow-300 hover:shadow-[0_0_22px_rgba(255,223,76,.2)] cursor-pointer"
-                >
-                  <div
-                    className="h-[150px] border-2 border-black mb-4 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${tour.image})` }}
-                  />
-                  <h3 className="text-2xl mb-4 font-black">{tour.title}</h3>
-                  <div className="flex gap-2 flex-wrap mb-5">
-                    <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                      {tour.tag1}
-                    </span>
-                    <span className="bg-black border border-[#444] px-3 py-2 text-sm font-black">
-                      {tour.tag2}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-4 font-black">
-                    <span>⭐ {tour.score}</span>
-                    <span className="text-green-400 text-xl">무료</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setPage("contents")}
-              className="inline-block mt-10 px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-            >
-              〈 목차로 돌아가기
-            </button>
-          </div>
-        </section>
-      );
-    }
-
-    // image_ca0a65.jpg 마인크래프트 마켓플레이스 UI 컨셉 레이아웃 구현 상세화면 컴포넌트
-    function TourDetailPage({ tourId, setPage }) {
-      const detail = tourDetails[tourId];
-
-      if (!detail) {
-        return (
-          <div className="min-h-screen bg-[#111] flex items-center justify-center text-white">
-            <p className="font-black text-xl">존재하지 않는 코스입니다.</p>
-          </div>
-        );
-      }
-
-      return (
-        <section className="min-h-screen bg-[#141414] text-white px-5 lg:px-12 py-10 font-sans">
-          {/* 상단 Breadcrumb & 뒤로가기 */}
-          <div className="text-sm font-bold text-gray-400 mb-8 flex items-center gap-2">
-            <button onClick={() => setPage("tour")} className="hover:underline text-yellow-300">관광투어</button>
-            <span> 〉 </span>
-            <span className="text-white">{detail.mainTitle}</span>
-          </div>
-
-          <div className="mb-12">
-            <h1 className="text-4xl lg:text-5xl font-black text-yellow-300 mb-4 drop-shadow-[2px_2px_0px_#000]">
-              {detail.mainTitle}
-            </h1>
-            <p className="text-gray-400 text-lg font-bold">{detail.desc}</p>
-          </div>
-
-          {/* 1단 섹션: 현재 마켓 인기 항목 구조 구현 */}
-          <div className="mb-14">
-            <h2 className="text-2xl font-black mb-6 flex items-center gap-2 text-white">
-              <span className="text-yellow-400">🔥</span> 지금 가장 핫한 필수 명소
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {detail.popular.map((item, idx) => (
-                <div key={idx} className="bg-[#1f1e1d] border-2 border-[#2d2c2a] rounded-sm p-4 transition hover:scale-[1.02] hover:border-yellow-400">
-                  <div 
-                    className="h-[180px] bg-cover bg-center border border-black rounded-sm mb-4"
-                    style={{ backgroundImage: `url(${item.img})` }}
-                  />
-                  <h3 className="text-xl font-black mb-2 text-white truncate">{item.title}</h3>
-                  <div className="inline-block bg-[#111] text-gray-400 border border-[#333] px-2 py-1 text-xs font-bold mb-4">
-                    👤 {item.tag}
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-[#2e2d2b]">
-                    <span className="text-xs text-gray-400 font-bold">{item.type}</span>
-                    <span className="bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-sm">
-                      {item.price}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 2단 섹션: image_ca0a65.jpg 하단 "추천 항목" 그리드 구조 완벽 복사 */}
-          <div className="mb-10">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                <span className="text-orange-400">🍕</span> 유행 및 추천 먹거리 스팟
-              </h2>
-              <span className="text-gray-500 text-2xl font-black">←</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {detail.recommend.map((item, idx) => (
-                <div key={idx} className="bg-[#1f1e1d] border-2 border-[#2d2c2a] rounded-sm p-4 transition hover:scale-[1.02] hover:border-yellow-400">
-                  <div 
-                    className="h-[180px] bg-cover bg-center border border-black rounded-sm mb-4"
-                    style={{ backgroundImage: `url(${item.img})` }}
-                  />
-                  <h3 className="text-xl font-black mb-2 text-white truncate">{item.title}</h3>
-                  <div className="inline-block bg-[#111] text-gray-400 border border-[#333] px-2 py-1 text-xs font-bold mb-4">
-                    🏃 {item.tag}
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-[#2e2d2b]">
-                    <span className="text-xs text-gray-400 font-bold">{item.type}</span>
-                    <span className="bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-sm">
-                      {item.price}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 하단 제어 단추 */}
-          <div className="mt-12 pt-6 border-t border-[#2d2c2a] flex gap-4">
-            <button
-              onClick={() => setPage("tour")}
-              className="px-6 py-3 border-[3px] border-yellow-500 text-yellow-400 font-black hover:bg-yellow-500 hover:text-black transition"
-            >
-              〈 목록으로 가기
-            </button>
-            <button
-              onClick={() => setPage("contents")}
-              className="px-6 py-3 border-[3px] border-green-500 text-green-400 font-black hover:bg-green-500 hover:text-black transition"
-            >
-              목차로 이동
-            </button>
-          </div>
-        </section>
-      );
-    }
-
-    function SupportPage({ setPage }) {
-      return (
-        <section className="min-h-screen bg-[#111] text-white">
-          <div className="min-h-[240px] bg-gradient-to-b from-[#101010] to-[#3d3115] border-b-[22px] border-yellow-400 flex items-center justify-center text-center px-5">
-            <div>
-              <h1 className="text-5xl lg:text-7xl font-black text-yellow-300 tracking-[8px] lg:tracking-[12px] mb-6 drop-shadow-[5px_5px_0px_#111]">
-                지원 · 협찬
-              </h1>
-              <p className="text-base lg:text-lg font-black leading-8">
-                Mentory 관광 프로젝트는 지역 업체와 함께합니다.<br />
-                관광객에게 더 좋은 경험을 제공하기 위한 협력 혜택을 소개합니다.
-              </p>
-            </div>
-          </div>
-
-          <main className="px-5 lg:px-10 py-14">
-            <div className="grid grid-cols-1 xl:grid-cols-[45%_55%] gap-8 items-stretch">
-              <section className="bg-[#24211f] border-4 border-[#3c3c3c] p-7 flex flex-col justify-between">
-                <div>
-                  <div className="inline-block bg-yellow-400 text-black px-4 py-2 font-black mb-6">
-                    OFFICIAL SUPPORT
-                  </div>
-
-                  <h2 className="text-4xl lg:text-5xl font-black mb-6 leading-tight">
-                    거북이 호텔<br />
-                    할인 지원 안내
-                  </h2>
-
-                  <p className="text-gray-300 font-bold leading-8 text-lg">
-                    Mentory 관광투어를 이용하는 방문객에게 거북이 호텔이 숙박 할인 혜택을
-                    제공하기로 했습니다. 관광 코스와 숙박을 함께 연결하여 부산 여행을 더
-                    편리하게 즐길 수 있도록 돕는 협찬 내용입니다.
-                  </p>
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <span className="bg-black border border-[#444] px-4 py-2 font-black">🏨 호텔 할인</span>
-                  <span className="bg-black border border-[#444] px-4 py-2 font-black">🤝 지역 협찬</span>
-                  <span className="bg-black border border-[#444] px-4 py-2 font-black">🗺️ 부산 관광</span>
-                </div>
-              </section>
-
-              <section className="bg-[#2b2927] border-4 border-[#3c3c3c] p-7">
-                <div className="h-[260px] lg:h-[360px] bg-gradient-to-br from-yellow-300 via-orange-400 to-[#3d3115] border-2 border-black flex items-center justify-center text-center relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-30 bg-[linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px)] bg-[length:42px_42px] rotate-6 scale-125" />
-                  <div className="relative z-10">
-                    <div className="text-7xl mb-4">🐢</div>
-                    <h3 className="text-5xl font-black drop-shadow-[4px_4px_0px_#000]">
-                      GEOBUGI HOTEL
-                    </h3>
-                    <p className="mt-4 bg-black text-yellow-300 inline-block px-5 py-2 font-black">
-                      Mentory 제휴 할인 제공
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-7 bg-[#1c1c1c] border-[3px] border-[#333] p-6 leading-8 font-bold text-gray-300">
-                  <h3 className="text-yellow-300 text-2xl font-black mb-3">협찬 내용</h3>
-                  <p>
-                    거북이 호텔은 Mentory 프로젝트와 연계하여 관광객 대상 숙박 할인 혜택을
-                    지원합니다. 발표에서는 이 협찬을 통해 관광 코스, 숙박, 지역 상권을 함께
-                    연결하는 구조를 보여줄 수 있습니다.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <a
-                    href="http://www.geobugi.co.kr/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="h-14 border-[3px] border-yellow-600 bg-yellow-400 text-black text-xl font-black flex items-center justify-center hover:brightness-110 transition"
-                  >
-                    호텔 홈페이지 보기 〉
-                  </a>
-
-                  <button
-                    onClick={() => setPage("contents")}
-                    className="h-14 border-[3px] border-green-500 text-green-400 text-xl font-black hover:bg-green-500 hover:text-black transition"
-                  >
-                    목차로 돌아가기
-                  </button>
-                </div>
-              </section>
-            </div>
-          </main>
-        </section>
-      );
-    }
-
-    function SimplePage({ title, setPage }) {
-      return (
-        <section className="min-h-screen bg-[#111] flex items-center justify-center px-5 text-center text-white">
-          <div className="bg-[#24211f] border-4 border-[#3c3c3c] p-10 max-w-xl">
-            <h1 className="text-5xl font-black text-yellow-300 mb-6">{title}</h1>
-            <p className="text-gray-300 font-bold leading-8 mb-8">
-              아직 상세 화면은 제작 전입니다. 메뉴 이동 테스트용 화면입니다.
-            </p>
-            <button
-              onClick={() => setPage("contents")}
-              className="px-7 py-4 border-[3px] border-green-500 text-green-400 font-black"
-            >
-              목차로 돌아가기
-            </button>
-          </div>
-        </section>
-      );
-    }
-
-    function MentoryPreview() {
-      const [page, setPage] = useState("main");
-
-      return (
-        <div className="min-h-screen bg-[#101010] text-white font-sans">
-          <Header page={page} setPage={setPage} />
-
-          {page === "main" && <MainPage setPage={setPage} />}
-          {page === "contents" && <ContentsPage setPage={setPage} />}
-          {page === "item" && <ItemPage setPage={setPage} />}
-          {page === "tour" && <TourPage setPage={setPage} />}
-          {page === "support" && <SupportPage setPage={setPage} />}
-          {page === "effect" && <SimplePage title="기대효과" setPage={setPage} />}
-          
-          {/* 하위 상세 페이지 라우팅 분기 처리 */}
-          {page === "tour-haeundae" && <TourDetailPage tourId="haeundae" setPage={setPage} />}
-          {page === "tour-gamcheon" && <TourDetailPage tourId="gamcheon" setPage={setPage} />}
-          {page === "tour-gwanganli" && <TourDetailPage tourId="gwanganli" setPage={setPage} />}
-          {page === "tour-oncheonjang" && <TourDetailPage tourId="oncheonjang" setPage={setPage} />}
+    function homeHTML() {
+      const c = crowd(buses[0].crowd);
+      return `
+        <div class="grid3">
+          <div class="card yellow"><div style="font-size:30px">🚌</div><p><b>금정 3번</b></p><h2>${buses[0].eta}분 후 도착</h2><p>현재 혼잡도: ${c.text}</p></div>
+          <div class="card"><div style="font-size:30px">📅</div><p class="sub">다음 수업</p><h2>국제마케팅</h2><p class="sub">10:30 · A동 505호</p></div>
+          <div class="card"><div style="font-size:30px">🍚</div><p class="sub">오늘의 학식</p><h2>돈까스 카레덮밥</h2><p class="sub">4,500원 · 보통</p></div>
         </div>
-      );
+        <div class="grid2">
+          <div class="card"><h2>빠른 메뉴 ⭐</h2><div class="grid2">${menus.slice(1).map(m => `<button class="small" onclick="setTab('${m[0]}')" style="text-align:left"><div style="font-size:24px">${m[1]}</div><b>${m[2]}</b><p class="sub">${m[3]}</p></button>`).join("")}</div></div>
+          <div class="card"><h2>인기 게시글 📢</h2><div class="list">${postRows()}</div></div>
+        </div>
+      `;
     }
 
-    // React 18 렌더링 적용
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<MentoryPreview />);
+    function postRows() {
+      const posts = [
+        ["분실물", "남산역 쪽에서 검은색 지갑 보신 분", 7],
+        ["중고거래", "전공책 싸게 판매합니다", 3],
+        ["자유", "오늘 금정 3번 왜 이렇게 사람 많나요", 12],
+        ["동아리", "외검회 신입 부원 모집합니다", 9]
+      ];
+      return posts.map(p => `<div class="small row"><div><span class="pill" style="background:#fef3c7;color:#a16207">${p[0]}</span><div><b>${p[1]}</b></div></div><span class="sub">댓글 ${p[2]}</span></div>`).join("");
+    }
+
+    function busHTML() {
+      const b = selectedBus || buses[0];
+      const c = crowd(b.crowd);
+      return `
+        <div class="bus-layout">
+          <div class="card" style="padding:0;overflow:hidden"><div id="map"></div></div>
+          <div class="list">
+            <div class="card"><h2>선택한 버스</h2><h2>🚌 ${b.id}</h2><p class="sub">다음 정류장: ${b.next}</p><div class="grid2"><div class="small">⏰<br><b>${b.eta}분</b></div><div class="small">👥<br><b>${c.text}</b></div></div></div>
+            <div class="card"><h2>시간대 예측 혼잡도</h2><div class="pill" style="background:${c.bg};color:${c.color}">${c.text}</div><p class="sub">실제 혼잡도 데이터가 없으면 시간대 기반으로 예측한다.</p></div>
+          </div>
+        </div>
+        <div class="card"><h2>정류장별 도착 정보</h2><div class="list">${stops.map(s => `<div class="small row"><div>📍 <b>${s.name}</b><p class="sub">예상 도착 ${s.eta}분 후</p></div><span class="pill" style="background:${crowd(s.crowdBase).bg};color:${crowd(s.crowdBase).color}">${crowd(s.crowdBase).text}</span></div>`).join("")}</div></div>
+      `;
+    }
+
+    function simpleHTML(title, icon, items) {
+      return `<div class="card"><h2>${icon} ${title}</h2><div class="list">${items.map(x => `<div class="small"><b>${x}</b></div>`).join("")}</div></div>`;
+    }
+
+    function render() {
+      renderMenu();
+      let html = "";
+      if (tab === "home") html = homeHTML();
+      else if (tab === "bus") html = busHTML();
+      else if (tab === "timetable") html = simpleHTML("학교 시간표", "📅", ["09:00 - 10:15 · 데이터베이스 · D동 302호", "10:30 - 11:45 · 국제마케팅 · A동 505호", "13:00 - 14:15 · 일본어 회화 · F동 201호"]);
+      else if (tab === "food") html = simpleHTML("오늘의 학식", "🍚", ["학생식당 · 돈까스 카레덮밥 + 미소국 · 4,500원", "분식코너 · 라면 + 김밥 세트 · 4,000원", "카페 · 아이스아메리카노 · 2,000원"]);
+      else if (tab === "board") html = simpleHTML("게시판", "📢", ["[분실물] 남산역 쪽에서 검은색 지갑 보신 분", "[중고거래] 전공책 싸게 판매합니다", "[동아리] 외검회 신입 부원 모집합니다"]);
+      else if (tab === "notice") html = simpleHTML("학교 정보", "🏫", ["학사일정", "장학금 공지", "국가근로 공지", "수강신청 일정"]);
+      else html = simpleHTML("주변 정보", "☕", ["남산역 카페", "학교 앞 맛집", "원룸 정보", "알바 정보"]);
+      html += `<div class="card yellow" style="margin-top:18px"><h2>카카오맵 연결 가능</h2><p>GitHub Pages 주소를 카카오 개발자센터 JavaScript SDK 도메인에 등록해야 지도 표시가 된다.</p></div>`;
+      document.getElementById("content").innerHTML = html;
+      if (tab === "bus") setTimeout(initMap, 50);
+    }
+
+    function initMap() {
+      const mapEl = document.getElementById("map");
+      if (!mapEl) return;
+      if (!window.kakao || !window.kakao.maps) {
+        mapEl.innerHTML = `<div style="padding:30px"><h2>카카오맵 로드 실패</h2><p>카카오 개발자센터에 GitHub Pages 도메인을 등록했는지 확인해줘.</p></div>`;
+        return;
+      }
+      window.kakao.maps.load(() => {
+        const center = new kakao.maps.LatLng(35.256, 129.091);
+        kakaoMap = new kakao.maps.Map(mapEl, { center, level: 6 });
+        overlays.forEach(o => o.setMap(null));
+        overlays = [];
+        const bounds = new kakao.maps.LatLngBounds();
+        stops.forEach(s => {
+          const pos = new kakao.maps.LatLng(s.lat, s.lng);
+          bounds.extend(pos);
+          const ov = new kakao.maps.CustomOverlay({ position: pos, yAnchor: 1.3, content: `<div style="padding:7px 10px;background:white;border:2px solid #facc15;border-radius:14px;font-size:12px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.18);white-space:nowrap">🚏 ${s.name}</div>` });
+          ov.setMap(kakaoMap);
+          overlays.push(ov);
+        });
+        buses.forEach(b => {
+          const pos = new kakao.maps.LatLng(b.lat, b.lng);
+          bounds.extend(pos);
+          const ov = new kakao.maps.CustomOverlay({ position: pos, yAnchor: 1.1, content: `<div style="padding:10px 12px;background:#111827;color:white;border-radius:16px;font-size:13px;font-weight:900;box-shadow:0 8px 18px rgba(0,0,0,.28);white-space:nowrap">🚌 ${b.id}<br><span style="font-size:11px">${crowd(b.crowd).text} · ${b.eta}분</span></div>` });
+          ov.setMap(kakaoMap);
+          overlays.push(ov);
+        });
+        kakaoMap.setBounds(bounds);
+      });
+    }
+
+    async function loadBusData() {
+      try {
+        setStatus("금정구 마을버스 운행현황 API 불러오는 중...");
+        const url = new URL(BUSAN_API_URL);
+        url.searchParams.set("page", "1");
+        url.searchParams.set("perPage", "100");
+        url.searchParams.set("serviceKey", BUSAN_API_KEY);
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(res.status);
+        const json = await res.json();
+        const rows = Array.isArray(json.data) ? json.data : [];
+        const targets = rows.filter(isGeumjeong3);
+        setStatus(`금정구 마을버스 API 연결됨 · 금정3 데이터 ${targets.length}건`);
+      } catch (e) {
+        setStatus("API 연결 실패 · 현재는 예시 데이터 표시 중");
+      }
+      render();
+    }
+
+    render();
+    loadBusData();
   </script>
 </body>
 </html>
