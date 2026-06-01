@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BUFS Campus Hub</title>
-  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=1ee1cf6aa1ebfffa368238d875d03b32&autoload=false"></script>
+  <title>BUFS Campus Hub - 금정3 실시간</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     * { box-sizing: border-box; }
     body {
@@ -14,34 +17,132 @@
       color: #0f172a;
     }
     .wrap { max-width: 1180px; margin: 0 auto; padding: 24px; }
-    header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-    .badge { display: inline-block; background: #facc15; color: #000; padding: 7px 13px; border-radius: 999px; font-weight: 900; font-size: 13px; margin-bottom: 10px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #facc15;
+      color: #000;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
     h1 { font-size: 42px; margin: 0; letter-spacing: -1.5px; }
     .sub { color: #64748b; margin: 8px 0 0; }
-    .status { color: #a16207; font-size: 13px; font-weight: 800; margin-top: 6px; }
+    .status {
+      color: #a16207;
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
     button { cursor: pointer; }
-    .refresh { background: #facc15; color: #000; border: 0; border-radius: 16px; padding: 12px 16px; font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .refresh {
+      background: #facc15;
+      color: #000;
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
     .layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
     .side { display: flex; flex-direction: column; gap: 10px; }
-    .menu { border: 1px solid #e2e8f0; background: #fff; border-radius: 22px; padding: 14px; text-align: left; box-shadow: 0 4px 10px rgba(15,23,42,.04); }
+    .menu {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 22px;
+      padding: 14px;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(15,23,42,.04);
+    }
     .menu.active { background: #facc15; border-color: #facc15; }
     .menu-top { display: flex; gap: 12px; align-items: center; }
-    .icon { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #fef3c7; font-size: 23px; }
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fef3c7;
+      font-size: 23px;
+    }
     .menu.active .icon { background: #111827; color: #facc15; }
     .menu-title { font-weight: 950; }
     .menu-desc { color: #64748b; font-size: 13px; }
-    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 24px; padding: 18px; box-shadow: 0 4px 12px rgba(15,23,42,.04); }
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(15,23,42,.04);
+    }
     .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 18px; }
     .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 18px; }
     .yellow { background: #facc15; color: #000; border: 0; }
-    .small { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px; padding: 14px; }
-    #map { height: 520px; border-radius: 24px; overflow: hidden; background: #e2e8f0; }
+    .small {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+    }
+    #map {
+      height: 520px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #e2e8f0;
+      z-index: 1;
+    }
     .bus-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 18px; }
-    .pill { border-radius: 999px; padding: 5px 10px; font-weight: 900; font-size: 13px; display: inline-block; }
+    .pill {
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-weight: 900;
+      font-size: 13px;
+      display: inline-block;
+    }
     .list { display: flex; flex-direction: column; gap: 10px; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    input { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px; padding: 10px 12px; outline: none; }
-    .hidden { display: none; }
+    .bus-marker {
+      background: #111827;
+      color: white;
+      border-radius: 14px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(0,0,0,.28);
+      white-space: nowrap;
+    }
+    .stop-marker {
+      background: white;
+      color: #111827;
+      border: 2px solid #facc15;
+      border-radius: 14px;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      white-space: nowrap;
+    }
+    .error {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
     @media (max-width: 900px) {
       .layout, .bus-layout, .grid2, .grid3 { grid-template-columns: 1fr; }
       h1 { font-size: 34px; }
@@ -54,10 +155,10 @@
       <div>
         <div class="badge">📡 부산외대 캠퍼스 생활 플랫폼</div>
         <h1>BUFS Campus Hub</h1>
-        <p class="sub">버스, 시간표, 학식, 게시판을 한 번에 확인하는 학생용 웹사이트</p>
-        <p id="status" class="status">카카오맵 가능 버전 · API 연결 전에는 예시 데이터 표시</p>
+        <p class="sub">금정3번 실제 버스 위치 전용 페이지</p>
+        <p id="status" class="status">지도 미리보기 로드 중</p>
       </div>
-      <button class="refresh" onclick="loadBusData()">↻ 새로고침</button>
+      <button class="refresh" onclick="loadRealBus()">↻ 실시간 새로고침</button>
     </header>
 
     <section class="layout">
@@ -67,62 +168,39 @@
   </div>
 
   <script>
-    const BUSAN_API_KEY = "3236d3a3cc4eca8b1a29348b32335181fa3ce87ef6394bc3a85ede3d363f827e";
-    const BUSAN_API_URL = "https://api.odcloud.kr/api/3070497/v1/uddi:5d92f49f-063c-4399-a9b2-e8cb662f239e";
-    const TARGET_BUS_NAME = "금정3";
+    /*
+      GitHub Pages용 실제 버전.
+      데모 버스는 없음.
+      API_PROXY_URL에 실시간 API 서버 주소를 넣어야 실제 차량이 표시된다.
+    */
+    const API_PROXY_URL = "";
+
+    const stops = [
+      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 },
+      { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934 },
+      { name: "금산빌라", lat: 35.261954127463724, lng: 129.08658387406516 },
+      { name: "부산외국어대학교 정문", lat: 35.26529515600763, lng: 129.0854060042107 },
+      { name: "부산외대 건학관", lat: 35.26719042771809, lng: 129.08026838270976 },
+      { name: "부산외국어대학교 정문", lat: 35.266608255514626, lng: 129.0846403141231 },
+      { name: "외성생활관", lat: 35.270001163137245, lng: 129.08528766024634 },
+      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 }
+    ];
 
     const menus = [
       ["home", "🏠", "홈", "전체 요약 보기"],
-      ["bus", "🚌", "실시간 버스", "금정 3번 위치·혼잡도"],
+      ["bus", "🚌", "실시간 버스", "금정3번 실제 위치"],
       ["timetable", "📅", "학교 시간표", "다음 수업 확인"],
-      ["food", "🍚", "오늘의 학식", "메뉴·가격·운영시간"],
-      ["board", "📢", "게시판", "자유·분실물·중고거래"],
-      ["notice", "🏫", "학교 정보", "공지·학사·장학"],
-      ["around", "☕", "주변 정보", "맛집·카페·알바"]
+      ["food", "🍚", "오늘의 학식", "메뉴·가격"],
+      ["board", "📢", "게시판", "자유·분실물"],
+      ["notice", "🏫", "학교 정보", "공지·장학"],
+      ["around", "☕", "주변 정보", "맛집·카페"]
     ];
 
-    const fallbackStops = [
-      { name: "부산외국어대학교", eta: 3, crowdBase: 82, lat: 35.2675, lng: 129.0903 },
-      { name: "남산역", eta: 6, crowdBase: 68, lat: 35.2652, lng: 129.0929 },
-      { name: "구서역", eta: 10, crowdBase: 56, lat: 35.2471, lng: 129.0914 },
-      { name: "금정구청", eta: 14, crowdBase: 73, lat: 35.2429, lng: 129.0922 },
-      { name: "장전역", eta: 19, crowdBase: 62, lat: 35.2381, lng: 129.0881 }
-    ];
-
-    const fallbackBuses = [
-      { id: "금정3-1", status: "운행중", next: "부산외국어대학교", eta: 3, crowd: 78, lat: 35.2668, lng: 129.0910 },
-      { id: "금정3-2", status: "운행중", next: "구서역", eta: 10, crowd: 54, lat: 35.2483, lng: 129.0919 },
-      { id: "금정3-3", status: "회차 대기", next: "장전역", eta: 19, crowd: 31, lat: 35.2384, lng: 129.0884 }
-    ];
-
-    let tab = "home";
-    let stops = [...fallbackStops];
-    let buses = [...fallbackBuses];
-    let selectedBus = buses[0];
-    let kakaoMap = null;
-    let overlays = [];
-
-    function crowd(v) {
-      if (v >= 75) return { text: "혼잡", color: "#ef4444", bg: "#fee2e2" };
-      if (v >= 45) return { text: "보통", color: "#ca8a04", bg: "#fef3c7" };
-      return { text: "여유", color: "#16a34a", bg: "#dcfce7" };
-    }
-    function estimateCrowdByTime() {
-      const h = new Date().getHours();
-      if ((h >= 7 && h <= 9) || (h >= 17 && h <= 19)) return 82;
-      if ((h >= 11 && h <= 16)) return 58;
-      return 32;
-    }
-    function pick(obj, keys) {
-      for (const k of keys) {
-        if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "") return String(obj[k]).trim();
-      }
-      return "";
-    }
-    function isGeumjeong3(row) {
-      const route = pick(row, ["노선명", "노선번호", "노선", "마을버스", "버스노선", "route", "routeName"]);
-      return route.replace(/\s/g, "").includes(TARGET_BUS_NAME);
-    }
+    let tab = "bus";
+    let map = null;
+    let buses = [];
+    let apiError = "";
+    let lastUpdated = "-";
 
     function setStatus(msg) {
       document.getElementById("status").textContent = msg;
@@ -149,42 +227,62 @@
     }
 
     function homeHTML() {
-      const c = crowd(buses[0].crowd);
       return `
         <div class="grid3">
-          <div class="card yellow"><div style="font-size:30px">🚌</div><p><b>금정 3번</b></p><h2>${buses[0].eta}분 후 도착</h2><p>현재 혼잡도: ${c.text}</p></div>
+          <div class="card yellow">
+            <div style="font-size:30px">🚌</div>
+            <p><b>금정3번</b></p>
+            <h2>${buses.length ? buses.length + "대 운행 중" : "API 연결 필요"}</h2>
+            <p>실제 API 전용</p>
+          </div>
           <div class="card"><div style="font-size:30px">📅</div><p class="sub">다음 수업</p><h2>국제마케팅</h2><p class="sub">10:30 · A동 505호</p></div>
-          <div class="card"><div style="font-size:30px">🍚</div><p class="sub">오늘의 학식</p><h2>돈까스 카레덮밥</h2><p class="sub">4,500원 · 보통</p></div>
+          <div class="card"><div style="font-size:30px">🍚</div><p class="sub">오늘의 학식</p><h2>돈까스 카레덮밥</h2><p class="sub">4,500원</p></div>
         </div>
-        <div class="grid2">
-          <div class="card"><h2>빠른 메뉴 ⭐</h2><div class="grid2">${menus.slice(1).map(m => `<button class="small" onclick="setTab('${m[0]}')" style="text-align:left"><div style="font-size:24px">${m[1]}</div><b>${m[2]}</b><p class="sub">${m[3]}</p></button>`).join("")}</div></div>
-          <div class="card"><h2>인기 게시글 📢</h2><div class="list">${postRows()}</div></div>
+        <div class="card">
+          <h2>실시간 상태</h2>
+          <p>마지막 갱신: ${lastUpdated}</p>
+          ${apiError ? `<div class="error">${apiError}</div>` : ""}
         </div>
       `;
     }
 
-    function postRows() {
-      const posts = [
-        ["분실물", "남산역 쪽에서 검은색 지갑 보신 분", 7],
-        ["중고거래", "전공책 싸게 판매합니다", 3],
-        ["자유", "오늘 금정 3번 왜 이렇게 사람 많나요", 12],
-        ["동아리", "외검회 신입 부원 모집합니다", 9]
-      ];
-      return posts.map(p => `<div class="small row"><div><span class="pill" style="background:#fef3c7;color:#a16207">${p[0]}</span><div><b>${p[1]}</b></div></div><span class="sub">댓글 ${p[2]}</span></div>`).join("");
-    }
-
     function busHTML() {
-      const b = selectedBus || buses[0];
-      const c = crowd(b.crowd);
       return `
         <div class="bus-layout">
           <div class="card" style="padding:0;overflow:hidden"><div id="map"></div></div>
           <div class="list">
-            <div class="card"><h2>선택한 버스</h2><h2>🚌 ${b.id}</h2><p class="sub">다음 정류장: ${b.next}</p><div class="grid2"><div class="small">⏰<br><b>${b.eta}분</b></div><div class="small">👥<br><b>${c.text}</b></div></div></div>
-            <div class="card"><h2>시간대 예측 혼잡도</h2><div class="pill" style="background:${c.bg};color:${c.color}">${c.text}</div><p class="sub">실제 혼잡도 데이터가 없으면 시간대 기반으로 예측한다.</p></div>
+            <div class="card">
+              <h2>금정3번 실제 위치</h2>
+              <h2>🚌 ${buses.length ? buses.length + "대" : "API 연결 필요"}</h2>
+              <p class="sub">마지막 갱신: ${lastUpdated}</p>
+              <div class="grid2">
+                <div class="small">📡<br><b>실제 API</b></div>
+                <div class="small">🗺️<br><b>OpenStreetMap</b></div>
+              </div>
+            </div>
+            <div class="card">
+              <h2>API 상태</h2>
+              <span class="pill" style="background:${buses.length ? "#dcfce7" : "#fee2e2"};color:${buses.length ? "#16a34a" : "#ef4444"}">${buses.length ? "연결됨" : "연결 필요"}</span>
+              ${apiError ? `<p class="sub">${apiError}</p>` : `<p class="sub">실제 버스 좌표를 표시 중이다.</p>`}
+            </div>
           </div>
         </div>
-        <div class="card"><h2>정류장별 도착 정보</h2><div class="list">${stops.map(s => `<div class="small row"><div>📍 <b>${s.name}</b><p class="sub">예상 도착 ${s.eta}분 후</p></div><span class="pill" style="background:${crowd(s.crowdBase).bg};color:${crowd(s.crowdBase).color}">${crowd(s.crowdBase).text}</span></div>`).join("")}</div></div>
+
+        <div class="card">
+          <h2>실시간 차량 목록</h2>
+          <div class="list">
+            ${
+              buses.length
+              ? buses.map(b => `
+                <div class="small row">
+                  <div>🚌 <b>${b.id || "차량"}</b><p class="sub">현재/다음 정류장: ${b.next || "정보 없음"}</p></div>
+                  <span class="pill" style="background:#dcfce7;color:#16a34a">실시간</span>
+                </div>
+              `).join("")
+              : `<div class="error">현재는 실제 API 서버 주소가 비어 있어 정류장 노선만 표시된다. GitHub Pages는 서버를 실행할 수 없기 때문에 API_PROXY_URL에 외부 API 주소를 넣어야 차량 위치가 뜬다.</div>`
+            }
+          </div>
+        </div>
       `;
     }
 
@@ -194,6 +292,7 @@
 
     function render() {
       renderMenu();
+
       let html = "";
       if (tab === "home") html = homeHTML();
       else if (tab === "bus") html = busHTML();
@@ -202,63 +301,98 @@
       else if (tab === "board") html = simpleHTML("게시판", "📢", ["[분실물] 남산역 쪽에서 검은색 지갑 보신 분", "[중고거래] 전공책 싸게 판매합니다", "[동아리] 외검회 신입 부원 모집합니다"]);
       else if (tab === "notice") html = simpleHTML("학교 정보", "🏫", ["학사일정", "장학금 공지", "국가근로 공지", "수강신청 일정"]);
       else html = simpleHTML("주변 정보", "☕", ["남산역 카페", "학교 앞 맛집", "원룸 정보", "알바 정보"]);
-      html += `<div class="card yellow" style="margin-top:18px"><h2>카카오맵 연결 가능</h2><p>GitHub Pages 주소를 카카오 개발자센터 JavaScript SDK 도메인에 등록해야 지도 표시가 된다.</p></div>`;
+
       document.getElementById("content").innerHTML = html;
-      if (tab === "bus") setTimeout(initMap, 50);
+      if (tab === "bus") setTimeout(initMap, 100);
+    }
+
+    function makeIcon(className, html) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="${className}">${html}</div>`,
+        iconSize: null,
+        iconAnchor: [40, 20]
+      });
     }
 
     function initMap() {
       const mapEl = document.getElementById("map");
-      if (!mapEl) return;
-      if (!window.kakao || !window.kakao.maps) {
-        mapEl.innerHTML = `<div style="padding:30px"><h2>카카오맵 로드 실패</h2><p>카카오 개발자센터에 GitHub Pages 도메인을 등록했는지 확인해줘.</p></div>`;
-        return;
+      if (!mapEl || !window.L) return;
+
+      if (map) {
+        map.remove();
+        map = null;
       }
-      window.kakao.maps.load(() => {
-        const center = new kakao.maps.LatLng(35.256, 129.091);
-        kakaoMap = new kakao.maps.Map(mapEl, { center, level: 6 });
-        overlays.forEach(o => o.setMap(null));
-        overlays = [];
-        const bounds = new kakao.maps.LatLngBounds();
-        stops.forEach(s => {
-          const pos = new kakao.maps.LatLng(s.lat, s.lng);
-          bounds.extend(pos);
-          const ov = new kakao.maps.CustomOverlay({ position: pos, yAnchor: 1.3, content: `<div style="padding:7px 10px;background:white;border:2px solid #facc15;border-radius:14px;font-size:12px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.18);white-space:nowrap">🚏 ${s.name}</div>` });
-          ov.setMap(kakaoMap);
-          overlays.push(ov);
-        });
-        buses.forEach(b => {
-          const pos = new kakao.maps.LatLng(b.lat, b.lng);
-          bounds.extend(pos);
-          const ov = new kakao.maps.CustomOverlay({ position: pos, yAnchor: 1.1, content: `<div style="padding:10px 12px;background:#111827;color:white;border-radius:16px;font-size:13px;font-weight:900;box-shadow:0 8px 18px rgba(0,0,0,.28);white-space:nowrap">🚌 ${b.id}<br><span style="font-size:11px">${crowd(b.crowd).text} · ${b.eta}분</span></div>` });
-          ov.setMap(kakaoMap);
-          overlays.push(ov);
-        });
-        kakaoMap.setBounds(bounds);
+
+      map = L.map("map", {
+        center: [35.2665, 129.087],
+        zoom: 14
       });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+
+      const bounds = [];
+
+      stops.forEach(s => {
+        bounds.push([s.lat, s.lng]);
+        L.marker([s.lat, s.lng], {
+          icon: makeIcon("stop-marker", `🚏 ${s.name}`)
+        }).addTo(map).bindPopup(`<b>${s.name}</b>`);
+      });
+
+      L.polyline(stops.map(s => [s.lat, s.lng]), {
+        weight: 5,
+        opacity: 0.65
+      }).addTo(map);
+
+      buses.forEach(b => {
+        if (!b.lat || !b.lng) return;
+        bounds.push([Number(b.lat), Number(b.lng)]);
+        L.marker([Number(b.lat), Number(b.lng)], {
+          icon: makeIcon("bus-marker", `🚌 ${b.id || "금정3"}<br><span style="font-size:11px">실시간</span>`)
+        }).addTo(map).bindPopup(`<b>${b.id || "금정3"}</b><br>${b.next || ""}`);
+      });
+
+      if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] });
+      setTimeout(() => map.invalidateSize(), 200);
     }
 
-    async function loadBusData() {
+    async function loadRealBus() {
       try {
-        setStatus("금정구 마을버스 운행현황 API 불러오는 중...");
-        const url = new URL(BUSAN_API_URL);
-        url.searchParams.set("page", "1");
-        url.searchParams.set("perPage", "100");
-        url.searchParams.set("serviceKey", BUSAN_API_KEY);
-        const res = await fetch(url.toString());
-        if (!res.ok) throw new Error(res.status);
-        const json = await res.json();
-        const rows = Array.isArray(json.data) ? json.data : [];
-        const targets = rows.filter(isGeumjeong3);
-        setStatus(`금정구 마을버스 API 연결됨 · 금정3 데이터 ${targets.length}건`);
+        if (!API_PROXY_URL) {
+          throw new Error("API_PROXY_URL이 비어 있다. 그래서 지금 미리보기에서는 정류장 노선만 표시된다.");
+        }
+
+        setStatus("실제 버스 API 불러오는 중...");
+
+        const res = await fetch(API_PROXY_URL);
+        const data = await res.json();
+
+        if (!data.ok) {
+          throw new Error(data.message || "API 응답 실패");
+        }
+
+        buses = Array.isArray(data.buses) ? data.buses : [];
+        apiError = "";
+        lastUpdated = new Date().toLocaleTimeString("ko-KR");
+
+        setStatus(`실시간 연결됨 · 차량 ${buses.length}대`);
       } catch (e) {
-        setStatus("API 연결 실패 · 현재는 예시 데이터 표시 중");
+        buses = [];
+        apiError = e.message;
+        lastUpdated = new Date().toLocaleTimeString("ko-KR");
+        setStatus("미리보기 표시 중 · 실제 차량 API는 아직 미연결");
       }
+
       render();
     }
 
     render();
-    loadBusData();
+    loadRealBus();
+    setInterval(loadRealBus, 10000);
   </script>
 </body>
 </html>
