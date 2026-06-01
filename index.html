@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BUFS Campus Hub - 금정3 실시간</title>
+  <title>BUFS Campus Hub - 금정3 위치</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -36,6 +36,7 @@
       margin-bottom: 10px;
     }
     h1 { font-size: 42px; margin: 0; letter-spacing: -1.5px; }
+    h2 { margin-top: 0; }
     .sub { color: #64748b; margin: 8px 0 0; }
     .status {
       color: #a16207;
@@ -45,7 +46,7 @@
       line-height: 1.5;
     }
     button { cursor: pointer; }
-    .refresh {
+    .refresh, .primary {
       background: #facc15;
       color: #000;
       border: 0;
@@ -53,6 +54,22 @@
       padding: 12px 16px;
       font-weight: 900;
       box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .ghost {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 9px 12px;
+      font-weight: 800;
+    }
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 0;
+      border-radius: 14px;
+      padding: 9px 12px;
+      font-weight: 800;
     }
     .layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
     .side { display: flex; flex-direction: column; gap: 10px; }
@@ -133,19 +150,66 @@
       box-shadow: 0 4px 12px rgba(0,0,0,.18);
       white-space: nowrap;
     }
-    .error {
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      color: #9a3412;
-      border-radius: 18px;
-      padding: 14px;
+    .arrival {
+      background: #facc15;
+      color: #000;
+      border-radius: 999px;
+      padding: 7px 12px;
       font-size: 13px;
-      line-height: 1.6;
-      word-break: keep-all;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    input {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+    .form label {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: #64748b;
+      margin-bottom: 5px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #111827, #334155);
+      color: white;
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero h2 {
+      font-size: 32px;
+      margin: 0;
+      letter-spacing: -1px;
+    }
+    .hero .sub { color: #cbd5e1; }
+    .hero-mini {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding: 16px;
     }
     @media (max-width: 900px) {
-      .layout, .bus-layout, .grid2, .grid3 { grid-template-columns: 1fr; }
+      .layout, .bus-layout, .grid2, .grid3, .hero, .form { grid-template-columns: 1fr; }
       h1 { font-size: 34px; }
+      .row { align-items: flex-start; }
     }
   </style>
 </head>
@@ -155,10 +219,9 @@
       <div>
         <div class="badge">📡 부산외대 캠퍼스 생활 플랫폼</div>
         <h1>BUFS Campus Hub</h1>
-        <p class="sub">금정3번 실제 버스 위치 전용 페이지</p>
-        <p id="status" class="status">지도 미리보기 로드 중</p>
+        <p class="sub">금정3번 위치, 시간표, 게시판을 한 번에 확인하는 학생용 웹사이트</p>
+        <p id="status" class="status">오늘도 좋은 하루 보내세요</p>
       </div>
-      <button class="refresh" onclick="loadRealBus()">↻ 실시간 새로고침</button>
     </header>
 
     <section class="layout">
@@ -168,13 +231,6 @@
   </div>
 
   <script>
-    /*
-      GitHub Pages용 실제 버전.
-      데모 버스는 없음.
-      API_PROXY_URL에 실시간 API 서버 주소를 넣어야 실제 차량이 표시된다.
-    */
-    const API_PROXY_URL = "";
-
     const stops = [
       { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 },
       { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934 },
@@ -186,21 +242,58 @@
       { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 }
     ];
 
+    const ROUND_MINUTES = 24;
+    const HEADWAY_MINUTES = 8;
+    const BUS_COUNT = 3;
+    const FIRST_BUS_HOUR = 6;
+    const LAST_BUS_HOUR = 24;
+
     const menus = [
       ["home", "🏠", "홈", "전체 요약 보기"],
-      ["bus", "🚌", "실시간 버스", "금정3번 실제 위치"],
-      ["timetable", "📅", "학교 시간표", "다음 수업 확인"],
-      ["food", "🍚", "오늘의 학식", "메뉴·가격"],
+      ["bus", "🚌", "버스 위치", "금정3번 위치"],
+      ["timetable", "📅", "학교 시간표", "직접 추가·수정"],
       ["board", "📢", "게시판", "자유·분실물"],
       ["notice", "🏫", "학교 정보", "공지·장학"],
       ["around", "☕", "주변 정보", "맛집·카페"]
     ];
 
-    let tab = "bus";
+    const defaultSchedule = [
+      { subject: "데이터베이스", time: "09:00 - 10:15", room: "D동 302호", memo: "쿼리 실습" },
+      { subject: "국제마케팅", time: "10:30 - 11:45", room: "A동 505호", memo: "발표 준비" },
+      { subject: "일본어 회화", time: "13:00 - 14:15", room: "F동 201호", memo: "회화 연습" }
+    ];
+
+    const defaultPosts = [
+      ["분실물", "남산역 쪽에서 검은색 지갑 보신 분", 7],
+      ["중고거래", "전공책 싸게 판매합니다", 3],
+      ["자유", "오늘 금정 3번 사람 많나요?", 12],
+      ["동아리", "외검회 신입 부원 모집합니다", 9]
+    ];
+
+    let tab = "home";
     let map = null;
-    let buses = [];
-    let apiError = "";
+    let busMarkers = [];
+    let estimatedBuses = [];
+    let stopArrivals = [];
     let lastUpdated = "-";
+    let editIndex = -1;
+
+    function loadSchedule() {
+      const saved = localStorage.getItem("bufs_schedule");
+      if (!saved) return [...defaultSchedule];
+
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [...defaultSchedule];
+      }
+    }
+
+    let schedule = loadSchedule();
+
+    function saveSchedule() {
+      localStorage.setItem("bufs_schedule", JSON.stringify(schedule));
+    }
 
     function setStatus(msg) {
       document.getElementById("status").textContent = msg;
@@ -223,25 +316,194 @@
 
     function setTab(t) {
       tab = t;
+      editIndex = -1;
       render();
     }
 
+    function distance(a, b) {
+      const dx = (a.lng - b.lng) * 91000;
+      const dy = (a.lat - b.lat) * 111000;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function routeData() {
+      const segs = [];
+      const stopProgress = [0];
+      let total = 0;
+
+      for (let i = 0; i < stops.length - 1; i++) {
+        const d = distance(stops[i], stops[i + 1]);
+        segs.push(d);
+        total += d;
+        stopProgress.push(total);
+      }
+
+      return {
+        segs,
+        total,
+        stopProgress: stopProgress.map(v => total ? v / total : 0)
+      };
+    }
+
+    function pointAtProgress(progress) {
+      const { segs, total } = routeData();
+      let target = progress * total;
+
+      for (let i = 0; i < segs.length; i++) {
+        if (target <= segs[i]) {
+          const a = stops[i];
+          const b = stops[i + 1];
+          const t = segs[i] === 0 ? 0 : target / segs[i];
+
+          return {
+            lat: a.lat + (b.lat - a.lat) * t,
+            lng: a.lng + (b.lng - a.lng) * t,
+            from: a.name,
+            to: b.name
+          };
+        }
+
+        target -= segs[i];
+      }
+
+      return {
+        lat: stops[0].lat,
+        lng: stops[0].lng,
+        from: stops[stops.length - 2].name,
+        to: stops[0].name
+      };
+    }
+
+    function isOperatingTime(now) {
+      const h = now.getHours();
+      return h >= FIRST_BUS_HOUR && h < LAST_BUS_HOUR;
+    }
+
+    function getEstimatedBuses() {
+      const now = new Date();
+      const minuteOfDay = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+      const firstMinute = FIRST_BUS_HOUR * 60;
+
+      if (!isOperatingTime(now)) return [];
+
+      const elapsed = Math.max(0, minuteOfDay - firstMinute);
+      const buses = [];
+
+      for (let i = 0; i < BUS_COUNT; i++) {
+        const offset = i * HEADWAY_MINUTES;
+        const busElapsed = elapsed - offset;
+
+        if (busElapsed < 0) continue;
+
+        const progress = ((busElapsed % ROUND_MINUTES) / ROUND_MINUTES);
+        const p = pointAtProgress(progress);
+
+        buses.push({
+          id: "금정3 " + (i + 1),
+          lat: p.lat,
+          lng: p.lng,
+          from: p.from,
+          to: p.to,
+          progress
+        });
+      }
+
+      return buses;
+    }
+
+    function getStopArrivals() {
+      const { stopProgress } = routeData();
+
+      return stops.slice(0, -1).map((s, idx) => {
+        if (!estimatedBuses.length) {
+          return { ...s, eta: "-" };
+        }
+
+        let best = Infinity;
+        const target = stopProgress[idx];
+
+        estimatedBuses.forEach(b => {
+          let diff = target - b.progress;
+          if (diff < 0) diff += 1;
+
+          const min = Math.ceil(diff * ROUND_MINUTES);
+          if (min < best) best = min;
+        });
+
+        if (best === 0) best = 1;
+
+        return { ...s, eta: best };
+      });
+    }
+
+    function nextClass() {
+      if (!schedule.length) return null;
+      return schedule[0];
+    }
+
     function homeHTML() {
+      const firstEta = stopArrivals[0]?.eta || "-";
+      const cls = nextClass();
+
       return `
+        <div class="hero">
+          <div>
+            <h2>오늘 캠퍼스 생활 한눈에 보기</h2>
+            <p class="sub">금정3번 위치, 수업 일정, 게시판을 빠르게 확인하세요.</p>
+          </div>
+          <div class="hero-mini">
+            <b>최근 갱신</b>
+            <p class="sub">${lastUpdated}</p>
+          </div>
+        </div>
+
         <div class="grid3">
           <div class="card yellow">
             <div style="font-size:30px">🚌</div>
             <p><b>금정3번</b></p>
-            <h2>${buses.length ? buses.length + "대 운행 중" : "API 연결 필요"}</h2>
-            <p>실제 API 전용</p>
+            <h2>약 ${firstEta}분 후</h2>
+            <p>범어사역 3번 출구 기준</p>
           </div>
-          <div class="card"><div style="font-size:30px">📅</div><p class="sub">다음 수업</p><h2>국제마케팅</h2><p class="sub">10:30 · A동 505호</p></div>
-          <div class="card"><div style="font-size:30px">🍚</div><p class="sub">오늘의 학식</p><h2>돈까스 카레덮밥</h2><p class="sub">4,500원</p></div>
+
+          <div class="card">
+            <div style="font-size:30px">📅</div>
+            <p class="sub">다음 수업</p>
+            <h2>${cls ? cls.subject : "수업 없음"}</h2>
+            <p class="sub">${cls ? cls.time + " · " + cls.room : "시간표를 추가해 주세요"}</p>
+          </div>
+
+          <div class="card">
+            <div style="font-size:30px">📢</div>
+            <p class="sub">게시판</p>
+            <h2>${defaultPosts[0][1]}</h2>
+            <p class="sub">댓글 ${defaultPosts[0][2]}개 · ${defaultPosts[0][0]}</p>
+          </div>
         </div>
-        <div class="card">
-          <h2>실시간 상태</h2>
-          <p>마지막 갱신: ${lastUpdated}</p>
-          ${apiError ? `<div class="error">${apiError}</div>` : ""}
+
+        <div class="grid2">
+          <div class="card">
+            <h2>정류장 도착 예정</h2>
+            <div class="list">
+              ${stopArrivals.slice(0, 4).map((s, i) => `
+                <div class="small row">
+                  <div>📍 <b>${s.name}</b></div>
+                  <span class="arrival">약 ${s.eta}분 후</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>오늘 수업</h2>
+            <div class="list">
+              ${schedule.slice(0, 4).map(c => `
+                <div class="small">
+                  <b>${c.subject}</b>
+                  <p class="sub">${c.time} · ${c.room}</p>
+                </div>
+              `).join("") || `<div class="small">시간표를 추가해 주세요.</div>`}
+            </div>
+          </div>
         </div>
       `;
     }
@@ -252,35 +514,109 @@
           <div class="card" style="padding:0;overflow:hidden"><div id="map"></div></div>
           <div class="list">
             <div class="card">
-              <h2>금정3번 실제 위치</h2>
-              <h2>🚌 ${buses.length ? buses.length + "대" : "API 연결 필요"}</h2>
+              <h2>금정3번 위치</h2>
+              <h2>🚌 ${estimatedBuses.length ? estimatedBuses.length + "대 표시" : "대기 중"}</h2>
               <p class="sub">마지막 갱신: ${lastUpdated}</p>
-              <div class="grid2">
-                <div class="small">📡<br><b>실제 API</b></div>
-                <div class="small">🗺️<br><b>OpenStreetMap</b></div>
-              </div>
+              <button class="refresh" onclick="updateEstimatedBus()">↻ 위치 갱신</button>
             </div>
             <div class="card">
-              <h2>API 상태</h2>
-              <span class="pill" style="background:${buses.length ? "#dcfce7" : "#fee2e2"};color:${buses.length ? "#16a34a" : "#ef4444"}">${buses.length ? "연결됨" : "연결 필요"}</span>
-              ${apiError ? `<p class="sub">${apiError}</p>` : `<p class="sub">실제 버스 좌표를 표시 중이다.</p>`}
+              <h2>도착 기준</h2>
+              <div class="grid2">
+                <div class="small">⏱️<br><b>${ROUND_MINUTES}분/1바퀴</b></div>
+                <div class="small">🔁<br><b>${HEADWAY_MINUTES}분 간격</b></div>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <h2>실시간 차량 목록</h2>
+          <h2>정류장별 도착 예정</h2>
           <div class="list">
             ${
-              buses.length
-              ? buses.map(b => `
+              stopArrivals.map((s, i) => `
                 <div class="small row">
-                  <div>🚌 <b>${b.id || "차량"}</b><p class="sub">현재/다음 정류장: ${b.next || "정보 없음"}</p></div>
-                  <span class="pill" style="background:#dcfce7;color:#16a34a">실시간</span>
+                  <div>📍 <b>${i + 1}. ${s.name}</b><p class="sub">금정3번 기준</p></div>
+                  <span class="arrival">약 ${s.eta}분 후</span>
                 </div>
               `).join("")
-              : `<div class="error">현재는 실제 API 서버 주소가 비어 있어 정류장 노선만 표시된다. GitHub Pages는 서버를 실행할 수 없기 때문에 API_PROXY_URL에 외부 API 주소를 넣어야 차량 위치가 뜬다.</div>`
             }
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>차량 목록</h2>
+          <div class="list">
+            ${
+              estimatedBuses.map(b => `
+                <div class="small row">
+                  <div>🚌 <b>${b.id}</b><p class="sub">${b.from} → ${b.to} 구간</p></div>
+                  <span class="pill" style="background:#ecfeff;color:#0891b2">운행 중</span>
+                </div>
+              `).join("")
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function timetableHTML() {
+      const editing = editIndex >= 0 ? schedule[editIndex] : { subject: "", time: "", room: "", memo: "" };
+
+      return `
+        <div class="card">
+          <h2>📅 학교 시간표</h2>
+          <div class="form">
+            <div>
+              <label>수업명</label>
+              <input id="subject" placeholder="예: 국제마케팅" value="${editing.subject || ""}">
+            </div>
+            <div>
+              <label>시간</label>
+              <input id="time" placeholder="예: 10:30 - 11:45" value="${editing.time || ""}">
+            </div>
+            <div>
+              <label>강의실</label>
+              <input id="room" placeholder="예: A동 505호" value="${editing.room || ""}">
+            </div>
+            <div>
+              <label>메모</label>
+              <input id="memo" placeholder="예: 발표 준비" value="${editing.memo || ""}">
+            </div>
+            <button class="primary" onclick="saveClass()">${editIndex >= 0 ? "수정" : "추가"}</button>
+          </div>
+
+          <div class="list">
+            ${schedule.map((c, i) => `
+              <div class="small row">
+                <div>
+                  <b>${c.subject}</b>
+                  <p class="sub">${c.time} · ${c.room}${c.memo ? " · " + c.memo : ""}</p>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="ghost" onclick="editClass(${i})">수정</button>
+                  <button class="danger" onclick="deleteClass(${i})">삭제</button>
+                </div>
+              </div>
+            `).join("") || `<div class="small">아직 등록된 수업이 없습니다.</div>`}
+          </div>
+        </div>
+      `;
+    }
+
+    function boardHTML() {
+      return `
+        <div class="card">
+          <h2>📢 게시판</h2>
+          <div class="list">
+            ${defaultPosts.map(p => `
+              <div class="small row">
+                <div>
+                  <span class="pill" style="background:#fef3c7;color:#a16207">${p[0]}</span>
+                  <div style="margin-top:8px"><b>${p[1]}</b></div>
+                </div>
+                <span class="sub">댓글 ${p[2]}</span>
+              </div>
+            `).join("")}
           </div>
         </div>
       `;
@@ -296,14 +632,48 @@
       let html = "";
       if (tab === "home") html = homeHTML();
       else if (tab === "bus") html = busHTML();
-      else if (tab === "timetable") html = simpleHTML("학교 시간표", "📅", ["09:00 - 10:15 · 데이터베이스 · D동 302호", "10:30 - 11:45 · 국제마케팅 · A동 505호", "13:00 - 14:15 · 일본어 회화 · F동 201호"]);
-      else if (tab === "food") html = simpleHTML("오늘의 학식", "🍚", ["학생식당 · 돈까스 카레덮밥 + 미소국 · 4,500원", "분식코너 · 라면 + 김밥 세트 · 4,000원", "카페 · 아이스아메리카노 · 2,000원"]);
-      else if (tab === "board") html = simpleHTML("게시판", "📢", ["[분실물] 남산역 쪽에서 검은색 지갑 보신 분", "[중고거래] 전공책 싸게 판매합니다", "[동아리] 외검회 신입 부원 모집합니다"]);
+      else if (tab === "timetable") html = timetableHTML();
+      else if (tab === "board") html = boardHTML();
       else if (tab === "notice") html = simpleHTML("학교 정보", "🏫", ["학사일정", "장학금 공지", "국가근로 공지", "수강신청 일정"]);
       else html = simpleHTML("주변 정보", "☕", ["남산역 카페", "학교 앞 맛집", "원룸 정보", "알바 정보"]);
 
       document.getElementById("content").innerHTML = html;
       if (tab === "bus") setTimeout(initMap, 100);
+    }
+
+    function saveClass() {
+      const subject = document.getElementById("subject").value.trim();
+      const time = document.getElementById("time").value.trim();
+      const room = document.getElementById("room").value.trim();
+      const memo = document.getElementById("memo").value.trim();
+
+      if (!subject || !time || !room) {
+        alert("수업명, 시간, 강의실은 입력해 주세요.");
+        return;
+      }
+
+      const item = { subject, time, room, memo };
+
+      if (editIndex >= 0) {
+        schedule[editIndex] = item;
+      } else {
+        schedule.push(item);
+      }
+
+      editIndex = -1;
+      saveSchedule();
+      render();
+    }
+
+    function editClass(i) {
+      editIndex = i;
+      render();
+    }
+
+    function deleteClass(i) {
+      schedule.splice(i, 1);
+      saveSchedule();
+      render();
     }
 
     function makeIcon(className, html) {
@@ -348,51 +718,30 @@
         opacity: 0.65
       }).addTo(map);
 
-      buses.forEach(b => {
-        if (!b.lat || !b.lng) return;
-        bounds.push([Number(b.lat), Number(b.lng)]);
-        L.marker([Number(b.lat), Number(b.lng)], {
-          icon: makeIcon("bus-marker", `🚌 ${b.id || "금정3"}<br><span style="font-size:11px">실시간</span>`)
-        }).addTo(map).bindPopup(`<b>${b.id || "금정3"}</b><br>${b.next || ""}`);
+      busMarkers = [];
+
+      estimatedBuses.forEach(b => {
+        bounds.push([b.lat, b.lng]);
+        const marker = L.marker([b.lat, b.lng], {
+          icon: makeIcon("bus-marker", `🚌 ${b.id}<br><span style="font-size:11px">버스 위치</span>`)
+        }).addTo(map).bindPopup(`<b>${b.id}</b><br>${b.from} → ${b.to}`);
+        busMarkers.push(marker);
       });
 
       if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] });
       setTimeout(() => map.invalidateSize(), 200);
     }
 
-    async function loadRealBus() {
-      try {
-        if (!API_PROXY_URL) {
-          throw new Error("API_PROXY_URL이 비어 있다. 그래서 지금 미리보기에서는 정류장 노선만 표시된다.");
-        }
-
-        setStatus("실제 버스 API 불러오는 중...");
-
-        const res = await fetch(API_PROXY_URL);
-        const data = await res.json();
-
-        if (!data.ok) {
-          throw new Error(data.message || "API 응답 실패");
-        }
-
-        buses = Array.isArray(data.buses) ? data.buses : [];
-        apiError = "";
-        lastUpdated = new Date().toLocaleTimeString("ko-KR");
-
-        setStatus(`실시간 연결됨 · 차량 ${buses.length}대`);
-      } catch (e) {
-        buses = [];
-        apiError = e.message;
-        lastUpdated = new Date().toLocaleTimeString("ko-KR");
-        setStatus("미리보기 표시 중 · 실제 차량 API는 아직 미연결");
-      }
-
+    function updateEstimatedBus() {
+      estimatedBuses = getEstimatedBuses();
+      stopArrivals = getStopArrivals();
+      lastUpdated = new Date().toLocaleTimeString("ko-KR");
+      if (tab === "bus") setStatus(`버스 위치 갱신됨 · ${lastUpdated}`);
       render();
     }
 
-    render();
-    loadRealBus();
-    setInterval(loadRealBus, 10000);
+    updateEstimatedBus();
+    setInterval(updateEstimatedBus, 10000);
   </script>
 </body>
 </html>
