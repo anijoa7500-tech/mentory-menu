@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BUFS Campus Hub - 금정3 위치</title>
+  <title>BUFS Campus Hub - AI 이동 도우미</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -159,7 +159,7 @@
       font-weight: 950;
       white-space: nowrap;
     }
-    input {
+    input, textarea {
       width: 100%;
       border: 1px solid #e2e8f0;
       background: #f8fafc;
@@ -167,7 +167,9 @@
       padding: 11px 12px;
       outline: none;
       font-size: 14px;
+      font-family: inherit;
     }
+    textarea { min-height: 120px; resize: vertical; }
     .form {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr auto;
@@ -175,7 +177,7 @@
       align-items: end;
       margin-bottom: 14px;
     }
-    .form label {
+    .form label, .ai-form label {
       display: block;
       font-size: 12px;
       font-weight: 900;
@@ -206,8 +208,45 @@
       border-radius: 22px;
       padding: 16px;
     }
+    .ai-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .ai-button {
+      text-align: left;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(15,23,42,.04);
+      font-weight: 900;
+    }
+    .ai-button span {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .ai-result {
+      background: #111827;
+      color: white;
+      border-radius: 22px;
+      padding: 18px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .ai-note {
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+      color: #155e75;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
     @media (max-width: 900px) {
-      .layout, .bus-layout, .grid2, .grid3, .hero, .form { grid-template-columns: 1fr; }
+      .layout, .bus-layout, .grid2, .grid3, .hero, .form, .ai-actions { grid-template-columns: 1fr; }
       h1 { font-size: 34px; }
       .row { align-items: flex-start; }
     }
@@ -219,7 +258,7 @@
       <div>
         <div class="badge">📡 부산외대 캠퍼스 생활 플랫폼</div>
         <h1>BUFS Campus Hub</h1>
-        <p class="sub">금정3번 위치, 시간표, 게시판을 한 번에 확인하는 학생용 웹사이트</p>
+        <p class="sub">금정3번 위치, 시간표, 게시판, AI 이동 도우미를 한 번에 확인하는 학생용 웹사이트</p>
         <p id="status" class="status">오늘도 좋은 하루 보내세요</p>
       </div>
     </header>
@@ -231,15 +270,32 @@
   </div>
 
   <script>
+    /*
+      Gemini API 사용 방법:
+      1. Google AI Studio에서 Gemini API Key 발급
+      2. 아래 GEMINI_API_KEY에 붙여넣기
+      3. 단, GitHub Pages에 올리면 키가 공개됨. 발표용 시연만 권장.
+      4. 안전하게 쓰려면 Vercel/Render/Firebase 같은 서버에서 호출해야 함.
+    */
+    const GEMINI_API_KEY = "AIzaSyBPpPcc8Va3caNqlnPZ9WRRTSrY5ZpGoVw";
+
     const stops = [
-      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 },
-      { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934 },
-      { name: "금산빌라", lat: 35.261954127463724, lng: 129.08658387406516 },
-      { name: "부산외국어대학교 정문", lat: 35.26529515600763, lng: 129.0854060042107 },
-      { name: "부산외대 건학관", lat: 35.26719042771809, lng: 129.08026838270976 },
-      { name: "부산외국어대학교 정문", lat: 35.266608255514626, lng: 129.0846403141231 },
-      { name: "외성생활관", lat: 35.270001163137245, lng: 129.08528766024634 },
-      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834 }
+      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834, type: "station" },
+      { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934, type: "station" },
+      { name: "금산빌라", lat: 35.261954127463724, lng: 129.08658387406516, type: "busstop" },
+      { name: "부산외국어대학교 정문", lat: 35.26529515600763, lng: 129.0854060042107, type: "school" },
+      { name: "부산외대 건학관", lat: 35.26719042771809, lng: 129.08026838270976, type: "school" },
+      { name: "부산외국어대학교 정문", lat: 35.266608255514626, lng: 129.0846403141231, type: "school" },
+      { name: "외성생활관", lat: 35.270001163137245, lng: 129.08528766024634, type: "dorm" },
+      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834, type: "station" }
+    ];
+
+    const subwayStations = [
+      { name: "범어사역", lat: 35.27277819059194, lng: 129.09250411093834 },
+      { name: "남산역", lat: 35.264947960761994, lng: 129.09220380441934 },
+      { name: "두실역", lat: 35.2574, lng: 129.0914 },
+      { name: "구서역", lat: 35.2471, lng: 129.0914 },
+      { name: "장전역", lat: 35.2381, lng: 129.0881 }
     ];
 
     const ROUND_MINUTES = 24;
@@ -252,6 +308,7 @@
       ["home", "🏠", "홈", "전체 요약 보기"],
       ["bus", "🚌", "버스 위치", "금정3번 위치"],
       ["timetable", "📅", "학교 시간표", "직접 추가·수정"],
+      ["ai", "🤖", "AI 이동 도우미", "지하철·수업·동선"],
       ["board", "📢", "게시판", "자유·분실물"],
       ["notice", "🏫", "학교 정보", "공지·장학"],
       ["around", "☕", "주변 정보", "맛집·카페"]
@@ -277,6 +334,13 @@
     let stopArrivals = [];
     let lastUpdated = "-";
     let editIndex = -1;
+    let userLocation = null;
+    let aiState = {
+      subway: "아직 확인하지 않았습니다.",
+      station: "아직 확인하지 않았습니다.",
+      classLeft: "아직 확인하지 않았습니다.",
+      route: "AI 동선 추천을 실행해 주세요."
+    };
 
     function loadSchedule() {
       const saved = localStorage.getItem("bufs_schedule");
@@ -415,9 +479,7 @@
       const { stopProgress } = routeData();
 
       return stops.slice(0, -1).map((s, idx) => {
-        if (!estimatedBuses.length) {
-          return { ...s, eta: "-" };
-        }
+        if (!estimatedBuses.length) return { ...s, eta: "-" };
 
         let best = Infinity;
         const target = stopProgress[idx];
@@ -425,35 +487,65 @@
         estimatedBuses.forEach(b => {
           let diff = target - b.progress;
           if (diff < 0) diff += 1;
-
           const min = Math.ceil(diff * ROUND_MINUTES);
           if (min < best) best = min;
         });
 
         if (best === 0) best = 1;
-
         return { ...s, eta: best };
       });
     }
 
+    function parseStartMinutes(timeText) {
+      const m = String(timeText).match(/(\d{1,2})\s*:\s*(\d{2})/);
+      if (!m) return null;
+      return Number(m[1]) * 60 + Number(m[2]);
+    }
+
+    function minutesUntilClass(item) {
+      if (!item) return null;
+      const start = parseStartMinutes(item.time);
+      if (start === null) return null;
+
+      const now = new Date();
+      const cur = now.getHours() * 60 + now.getMinutes();
+
+      return start - cur;
+    }
+
     function nextClass() {
       if (!schedule.length) return null;
-      return schedule[0];
+
+      const now = new Date();
+      const cur = now.getHours() * 60 + now.getMinutes();
+
+      const sorted = [...schedule].sort((a, b) => {
+        const aa = parseStartMinutes(a.time) ?? 9999;
+        const bb = parseStartMinutes(b.time) ?? 9999;
+        return aa - bb;
+      });
+
+      return sorted.find(c => {
+        const start = parseStartMinutes(c.time);
+        return start !== null && start >= cur;
+      }) || sorted[0];
     }
 
     function homeHTML() {
       const firstEta = stopArrivals[0]?.eta || "-";
       const cls = nextClass();
+      const left = minutesUntilClass(cls);
 
       return `
         <div class="hero">
           <div>
             <h2>오늘 캠퍼스 생활 한눈에 보기</h2>
-            <p class="sub">금정3번 위치, 수업 일정, 게시판을 빠르게 확인하세요.</p>
+            <p class="sub">금정3번 위치, 수업 일정, AI 이동 도우미를 빠르게 확인하세요.</p>
           </div>
           <div class="hero-mini">
-            <b>최근 갱신</b>
-            <p class="sub">${lastUpdated}</p>
+            <b>AI 이동 도우미</b>
+            <p class="sub">지하철·버스·수업 시간을 묶어서 동선을 추천합니다.</p>
+            <button class="refresh" onclick="setTab('ai')" style="margin-top:10px">AI 도우미 열기</button>
           </div>
         </div>
 
@@ -473,10 +565,10 @@
           </div>
 
           <div class="card">
-            <div style="font-size:30px">📢</div>
-            <p class="sub">게시판</p>
-            <h2>${defaultPosts[0][1]}</h2>
-            <p class="sub">댓글 ${defaultPosts[0][2]}개 · ${defaultPosts[0][0]}</p>
+            <div style="font-size:30px">🤖</div>
+            <p class="sub">수업까지</p>
+            <h2>${left === null ? "-" : left <= 0 ? "진행 중" : left + "분 남음"}</h2>
+            <p class="sub">AI 동선 추천 가능</p>
           </div>
         </div>
 
@@ -494,14 +586,14 @@
           </div>
 
           <div class="card">
-            <h2>오늘 수업</h2>
+            <h2>게시판</h2>
             <div class="list">
-              ${schedule.slice(0, 4).map(c => `
+              ${defaultPosts.slice(0, 4).map(p => `
                 <div class="small">
-                  <b>${c.subject}</b>
-                  <p class="sub">${c.time} · ${c.room}</p>
+                  <b>${p[1]}</b>
+                  <p class="sub">${p[0]} · 댓글 ${p[2]}개</p>
                 </div>
-              `).join("") || `<div class="small">시간표를 추가해 주세요.</div>`}
+              `).join("")}
             </div>
           </div>
         </div>
@@ -603,6 +695,64 @@
       `;
     }
 
+    function aiHTML() {
+      const cls = nextClass();
+      const left = minutesUntilClass(cls);
+      const firstEta = stopArrivals[0]?.eta || "-";
+
+      return `
+        <div class="card">
+          <h2>🤖 AI 이동 도우미</h2>
+          <p class="sub">현재 위치, 가까운 지하철역, 수업 시간, 금정3번 도착 정보를 바탕으로 동선을 추천합니다.</p>
+        </div>
+
+        <div class="ai-actions">
+          <button class="ai-button" onclick="checkSubway()">
+            <span>🚇</span>
+            1. 지하철 탑승 여부 확인
+            <p class="sub">${aiState.subway}</p>
+          </button>
+
+          <button class="ai-button" onclick="checkNearestStation()">
+            <span>📍</span>
+            2. 지나고 있는 역 확인
+            <p class="sub">${aiState.station}</p>
+          </button>
+
+          <button class="ai-button" onclick="checkClassTime()">
+            <span>⏰</span>
+            3. 수업까지 남은 시간
+            <p class="sub">${aiState.classLeft}</p>
+          </button>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h2>현재 데이터</h2>
+            <div class="list">
+              <div class="small row"><div>🚌 <b>범어사역 금정3</b></div><span class="arrival">약 ${firstEta}분 후</span></div>
+              <div class="small"><b>다음 수업</b><p class="sub">${cls ? cls.subject + " · " + cls.time + " · " + cls.room : "수업 없음"}</p></div>
+              <div class="small"><b>수업까지</b><p class="sub">${left === null ? "-" : left <= 0 ? "진행 중" : left + "분 남음"}</p></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Gemini API 설정</h2>
+            <div class="ai-note">
+              GEMINI_API_KEY가 비어 있으면 사이트 자체 계산으로 추천합니다.<br>
+              키를 넣으면 Gemini가 문장형 동선을 만들어줍니다.
+            </div>
+            <button class="refresh" onclick="recommendRoute()" style="margin-top:14px;width:100%">최적 동선 추천</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>추천 결과</h2>
+          <div class="ai-result">${aiState.route}</div>
+        </div>
+      `;
+    }
+
     function boardHTML() {
       return `
         <div class="card">
@@ -633,6 +783,7 @@
       if (tab === "home") html = homeHTML();
       else if (tab === "bus") html = busHTML();
       else if (tab === "timetable") html = timetableHTML();
+      else if (tab === "ai") html = aiHTML();
       else if (tab === "board") html = boardHTML();
       else if (tab === "notice") html = simpleHTML("학교 정보", "🏫", ["학사일정", "장학금 공지", "국가근로 공지", "수강신청 일정"]);
       else html = simpleHTML("주변 정보", "☕", ["남산역 카페", "학교 앞 맛집", "원룸 정보", "알바 정보"]);
@@ -654,11 +805,8 @@
 
       const item = { subject, time, room, memo };
 
-      if (editIndex >= 0) {
-        schedule[editIndex] = item;
-      } else {
-        schedule.push(item);
-      }
+      if (editIndex >= 0) schedule[editIndex] = item;
+      else schedule.push(item);
 
       editIndex = -1;
       saveSchedule();
@@ -737,6 +885,168 @@
       stopArrivals = getStopArrivals();
       lastUpdated = new Date().toLocaleTimeString("ko-KR");
       if (tab === "bus") setStatus(`버스 위치 갱신됨 · ${lastUpdated}`);
+      render();
+    }
+
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("현재 브라우저에서 위치 기능을 지원하지 않습니다."));
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            userLocation = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy
+            };
+            resolve(userLocation);
+          },
+          err => reject(new Error("위치 권한이 거부되었거나 현재 위치를 가져오지 못했습니다.")),
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+        );
+      });
+    }
+
+    function nearestStation(loc) {
+      let best = null;
+
+      subwayStations.forEach(s => {
+        const d = distance(loc, s);
+        if (!best || d < best.d) best = { ...s, d };
+      });
+
+      return best;
+    }
+
+    async function checkNearestStation() {
+      try {
+        const loc = await getLocation();
+        const st = nearestStation(loc);
+        aiState.station = `${st.name} 근처로 추정됩니다. 약 ${Math.round(st.d)}m 거리`;
+      } catch (e) {
+        aiState.station = e.message;
+      }
+
+      render();
+    }
+
+    async function checkSubway() {
+      try {
+        const loc = await getLocation();
+        const st = nearestStation(loc);
+
+        if (st.d <= 120) {
+          aiState.subway = `${st.name} 승강장 또는 역사 근처로 추정됩니다.`;
+        } else if (st.d <= 350) {
+          aiState.subway = `${st.name} 주변입니다. 지하철에서 내렸거나 역 근처일 가능성이 있습니다.`;
+        } else {
+          aiState.subway = `가장 가까운 역은 ${st.name}이지만 약 ${Math.round(st.d)}m 떨어져 있습니다.`;
+        }
+      } catch (e) {
+        aiState.subway = e.message;
+      }
+
+      render();
+    }
+
+    function checkClassTime() {
+      const cls = nextClass();
+      const left = minutesUntilClass(cls);
+
+      if (!cls || left === null) {
+        aiState.classLeft = "시간표가 없거나 시간 형식이 맞지 않습니다.";
+      } else if (left < 0) {
+        aiState.classLeft = `${cls.subject} 수업은 이미 시작했습니다.`;
+      } else {
+        aiState.classLeft = `${cls.subject} 수업까지 ${left}분 남았습니다.`;
+      }
+
+      render();
+    }
+
+    function localRouteAdvice() {
+      const cls = nextClass();
+      const left = minutesUntilClass(cls);
+      const beomeosaEta = stopArrivals[0]?.eta;
+      const namsanEta = stopArrivals[1]?.eta;
+      const stationText = aiState.station;
+      const subwayText = aiState.subway;
+
+      let msg = "";
+
+      msg += "추천 동선\n";
+      msg += "1. 현재 위치 확인: " + stationText + "\n";
+      msg += "2. 지하철 상태: " + subwayText + "\n";
+      msg += "3. 금정3번 예상 도착: 범어사역 약 " + beomeosaEta + "분 후, 남산역 약 " + namsanEta + "분 후\n";
+
+      if (cls && left !== null) {
+        msg += "4. 다음 수업: " + cls.subject + " / " + cls.time + " / " + cls.room + "\n";
+        msg += "5. 수업까지 남은 시간: " + (left <= 0 ? "이미 시작됨" : left + "분") + "\n\n";
+
+        if (left <= 0) {
+          msg += "결론: 이미 수업이 시작됐으니 가장 가까운 역에서 바로 내려 금정3번이나 택시를 이용하는 편이 좋습니다.";
+        } else if (left <= 15) {
+          msg += "결론: 시간이 촉박합니다. 가장 가까운 역에서 내려 바로 금정3번을 타고, 버스 대기 시간이 길면 택시나 도보 대체를 고려하세요.";
+        } else if (left <= 30) {
+          msg += "결론: 금정3번 도착 시간이 10분 이내라면 버스를 타는 것이 좋고, 10분 이상이면 바로 이동할 수 있는 정류장을 선택하세요.";
+        } else {
+          msg += "결론: 시간 여유가 있습니다. 범어사역 또는 남산역에서 내려 금정3번을 이용하면 됩니다.";
+        }
+      } else {
+        msg += "\n결론: 시간표를 먼저 추가하면 수업 시간에 맞춘 동선 추천이 더 정확해집니다.";
+      }
+
+      return msg;
+    }
+
+    async function recommendRoute() {
+      checkClassTime();
+
+      if (!aiState.station.includes("근처") && !aiState.station.includes("거리")) {
+        await checkNearestStation();
+      }
+
+      if (!aiState.subway.includes("추정") && !aiState.subway.includes("떨어져")) {
+        await checkSubway();
+      }
+
+      const prompt = localRouteAdvice();
+
+      if (!GEMINI_API_KEY) {
+        aiState.route = prompt;
+        render();
+        return;
+      }
+
+      try {
+        aiState.route = "Gemini가 동선을 분석 중입니다...";
+        render();
+
+        const body = {
+          contents: [{
+            parts: [{
+              text: `너는 부산외국어대학교 학생을 위한 이동 도우미야. 아래 데이터를 보고 가장 빠른 동선을 한국어로 짧고 명확하게 추천해줘.\n\n${prompt}`
+            }]
+          }]
+        };
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        aiState.route = text || prompt;
+      } catch (e) {
+        aiState.route = prompt + "\n\nGemini API 호출은 실패해서 사이트 자체 계산 결과를 표시했습니다.";
+      }
+
       render();
     }
 
