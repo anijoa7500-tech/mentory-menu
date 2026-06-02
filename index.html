@@ -130,26 +130,50 @@
     .list { display: flex; flex-direction: column; gap: 10px; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .bus-marker {
+      position: relative;
+      width: 64px;
+      height: 46px;
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.35));
+      transform: translateY(-4px);
+    }
+    .bus-marker svg {
+      display: block;
+      width: 64px;
+      height: 42px;
+    }
+    .bus-route-label {
+      position: absolute;
+      left: 50%;
+      top: 13px;
+      transform: translateX(-50%);
       background: #111827;
-      color: white;
-      border-radius: 14px;
-      padding: 8px 10px;
-      font-size: 13px;
-      font-weight: 900;
-      box-shadow: 0 8px 18px rgba(0,0,0,.28);
+      color: #facc15;
+      border-radius: 999px;
+      padding: 1px 6px 2px;
+      font-size: 9px;
+      font-weight: 950;
+      letter-spacing: -.2px;
       white-space: nowrap;
+      line-height: 1.2;
     }
     .stop-marker {
-      background: white;
+      width: 22px;
+      height: 22px;
+      background: #fff;
       color: #111827;
-      border: 2px solid #facc15;
-      border-radius: 14px;
-      padding: 6px 9px;
-      font-size: 12px;
-      font-weight: 900;
-      box-shadow: 0 4px 12px rgba(0,0,0,.18);
-      white-space: nowrap;
+      border: 4px solid #facc15;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 950;
+      box-shadow: 0 3px 10px rgba(0,0,0,.22);
+      line-height: 1;
     }
+    .stop-marker.station { border-color: #38bdf8; }
+    .stop-marker.school { border-color: #22c55e; }
+    .stop-marker.dorm { border-color: #a855f7; }
     .arrival {
       background: #facc15;
       color: #000;
@@ -159,7 +183,7 @@
       font-weight: 950;
       white-space: nowrap;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       border: 1px solid #e2e8f0;
       background: #f8fafc;
@@ -177,6 +201,8 @@
       align-items: end;
       margin-bottom: 14px;
     }
+    .form.club { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
+    .form.room { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
     .form label, .ai-form label {
       display: block;
       font-size: 12px;
@@ -245,8 +271,82 @@
       font-size: 13px;
       line-height: 1.6;
     }
+
+    .bottom-nav, .more-sheet { display: none; }
+
     @media (max-width: 900px) {
-      .layout, .bus-layout, .grid2, .grid3, .hero, .form, .ai-actions { grid-template-columns: 1fr; }
+      .layout { display: block; }
+      .side { display: none; }
+      .wrap { padding: 18px 14px 96px; }
+      header { margin-bottom: 14px; }
+      .bottom-nav {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 72px;
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(14px);
+        border-top: 1px solid #e2e8f0;
+        z-index: 9999;
+        padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+        box-shadow: 0 -8px 24px rgba(15,23,42,.08);
+      }
+      .bottom-nav button {
+        flex: 1;
+        border: 0;
+        background: transparent;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 900;
+        color: #64748b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+      .bottom-nav button .nav-icon { font-size: 22px; line-height: 1; }
+      .bottom-nav button.active {
+        background: #facc15;
+        color: #111827;
+      }
+      .more-sheet {
+        display: none;
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 82px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 12px;
+        z-index: 10000;
+        box-shadow: 0 18px 45px rgba(15,23,42,.22);
+      }
+      .more-sheet.open { display: block; }
+      .more-sheet button {
+        width: 100%;
+        border: 0;
+        background: #f8fafc;
+        border-radius: 18px;
+        padding: 14px;
+        margin: 5px 0;
+        text-align: left;
+        font-weight: 900;
+        color: #0f172a;
+      }
+      .more-title {
+        font-size: 13px;
+        font-weight: 950;
+        color: #64748b;
+        padding: 5px 4px 8px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .layout, .bus-layout, .grid2, .grid3, .hero, .form, .form.club, .form.room, .ai-actions { grid-template-columns: 1fr; }
       h1 { font-size: 34px; }
       .row { align-items: flex-start; }
     }
@@ -258,7 +358,7 @@
       <div>
         <div class="badge">📡 부산외대 캠퍼스 생활 플랫폼</div>
         <h1>BUFS Campus Hub</h1>
-        <p class="sub">금정3번 위치, 시간표, 게시판, AI 이동 도우미를 한 번에 확인하는 학생용 웹사이트</p>
+        <p class="sub">금정3번 위치, 시간표, 공지사항, 동아리 홍보, 빈 강의실을 한 번에 확인하는 학생용 웹사이트</p>
         <p id="status" class="status">오늘도 좋은 하루 보내세요</p>
       </div>
     </header>
@@ -268,6 +368,16 @@
       <main id="content"></main>
     </section>
   </div>
+
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <div class="more-sheet" id="moreSheet">
+    <div class="more-title">더보기 메뉴</div>
+    <button onclick="setTab('notice')">📢 공지사항</button>
+    <button onclick="setTab('club')">🎓 동아리 홍보</button>
+    <button onclick="setTab('emptyroom')">🏫 빈 강의실</button>
+  </div>
+
 
   <script>
     /*
@@ -280,18 +390,42 @@
     const GEMINI_API_KEY = "AIzaSyBPpPcc8Va3caNqlnPZ9WRRTSrY5ZpGoVw";
 
     const stops = [
-      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834, type: "station" },
-      { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934, type: "station" },
-      { name: "금산빌라", lat: 35.261954127463724, lng: 129.08658387406516, type: "busstop" },
-      { name: "부산외국어대학교 정문", lat: 35.26529515600763, lng: 129.0854060042107, type: "school" },
-      { name: "부산외대 건학관", lat: 35.26719042771809, lng: 129.08026838270976, type: "school" },
-      { name: "부산외국어대학교 정문", lat: 35.266608255514626, lng: 129.0846403141231, type: "school" },
-      { name: "외성생활관", lat: 35.270001163137245, lng: 129.08528766024634, type: "dorm" },
-      { name: "범어사역 3번 출구", lat: 35.27277819059194, lng: 129.09250411093834, type: "station" }
+      // 지도 정류장 원이 노선 위에 정확히 올라오도록 routePath와 같은 좌표를 사용합니다.
+      { name: "범어사역 3번 출구", short: "범", lat: 35.27310748331574, lng: 129.09248236477887, type: "station" },
+      { name: "남산역 3번 출구", short: "남", lat: 35.264947960761994, lng: 129.09220380441934, type: "station" },
+      { name: "금산빌라", short: "금", lat: 35.261954127463724, lng: 129.08658387406516, type: "busstop" },
+      { name: "부산외국어대학교 정문", short: "정", lat: 35.26529257274461, lng: 129.08542516605348, type: "school" },
+      { name: "부산외대 건학관", short: "건", lat: 35.26721937142327, lng: 129.0802883514111, type: "school" },
+      { name: "부산외국어대학교 정문", short: "정", lat: 35.26660619295775, lng: 129.08462927362527, type: "school" },
+      { name: "외성생활관", short: "생", lat: 35.270001163137245, lng: 129.08528766024634, type: "dorm" },
+      { name: "범어사역 3번 출구", short: "범", lat: 35.27310748331574, lng: 129.09248236477887, type: "station" }
+    ];
+
+    // 실제 금정3번이 지나가는 도로 경유 좌표입니다.
+    // 정류장 표시는 stops를 쓰고, 버스 이동선과 예상 위치 계산은 routePath를 씁니다.
+    const routePath = [
+      { name: "범어사역 3번 출구", lat: 35.27310748331574, lng: 129.09248236477887 },
+      { name: "남산역 북측 경유", lat: 35.266662694988405, lng: 129.09270663807226 },
+      { name: "남산역 3번 출구", lat: 35.264947960761994, lng: 129.09220380441934 },
+      { name: "남산역 남측 경유", lat: 35.260407225550885, lng: 129.09123281982295 },
+      { name: "금산빌라 인근 경유", lat: 35.26096135026399, lng: 129.08732474924207 },
+      { name: "금산빌라", lat: 35.261954127463724, lng: 129.08658387406516 },
+      { name: "캠퍼스 아래 경유", lat: 35.26370696312229, lng: 129.08487910845318 },
+      { name: "부산외국어대학교 정문", lat: 35.26529257274461, lng: 129.08542516605348 },
+      { name: "정문 회차 경유", lat: 35.26622004311135, lng: 129.08494351234063 },
+      { name: "부산외대 건학관", lat: 35.26721937142327, lng: 129.0802883514111 },
+      { name: "정문 회차 경유", lat: 35.266457644747625, lng: 129.0847518246738 },
+      { name: "부산외국어대학교 정문", lat: 35.26660619295775, lng: 129.08462927362527 },
+      { name: "외성생활관 인근 경유", lat: 35.2683590825234, lng: 129.08527303380004 },
+      { name: "외성생활관", lat: 35.270001163137245, lng: 129.08528766024634 },
+      { name: "범어사역 서측 경유", lat: 35.27517249721455, lng: 129.08522795014656 },
+      { name: "범어사역 북측 경유", lat: 35.2754346579506, lng: 129.0903994224767 },
+      { name: "범어사역 인근 경유", lat: 35.27375883804652, lng: 129.09246615758434 },
+      { name: "범어사역 3번 출구", lat: 35.27310748331574, lng: 129.09248236477887 }
     ];
 
     const subwayStations = [
-      { name: "범어사역", lat: 35.27277819059194, lng: 129.09250411093834 },
+      { name: "범어사역", lat: 35.27310748331574, lng: 129.09248236477887 },
       { name: "남산역", lat: 35.264947960761994, lng: 129.09220380441934 },
       { name: "두실역", lat: 35.2574, lng: 129.0914 },
       { name: "구서역", lat: 35.2471, lng: 129.0914 },
@@ -309,9 +443,9 @@
       ["bus", "🚌", "버스 위치", "금정3번 위치"],
       ["timetable", "📅", "학교 시간표", "직접 추가·수정"],
       ["ai", "🤖", "AI 이동 도우미", "지하철·수업·동선"],
-      ["board", "📢", "게시판", "자유·분실물"],
-      ["notice", "🏫", "학교 정보", "공지·장학"],
-      ["around", "☕", "주변 정보", "맛집·카페"]
+      ["notice", "📢", "공지사항", "학사·장학·행사"],
+      ["club", "🎓", "동아리 홍보", "모집·행사·문의"],
+      ["emptyroom", "🏫", "빈 강의실", "사용 가능한 강의실"]
     ];
 
     const defaultSchedule = [
@@ -320,20 +454,36 @@
       { subject: "일본어 회화", time: "13:00 - 14:15", room: "F동 201호", memo: "회화 연습" }
     ];
 
-    const defaultPosts = [
-      ["분실물", "남산역 쪽에서 검은색 지갑 보신 분", 7],
-      ["중고거래", "전공책 싸게 판매합니다", 3],
-      ["자유", "오늘 금정 3번 사람 많나요?", 12],
-      ["동아리", "외검회 신입 부원 모집합니다", 9]
+    const defaultNotices = [
+      { category: "학사", title: "수강신청 변경 기간 안내", content: "수강신청 변경 기간과 신청 방법을 확인하세요.", date: "오늘" },
+      { category: "장학", title: "국가장학금 신청 안내", content: "신청 기간 내 한국장학재단에서 신청하세요.", date: "이번 주" },
+      { category: "행사", title: "교내 프로그램 모집 안내", content: "멘토링, 비교과 프로그램, 특강 일정을 확인하세요.", date: "예정" }
+    ];
+
+    const defaultClubs = [
+      { name: "외검회", field: "검도", time: "화/목 19:00", place: "체육관", contact: "오픈채팅 문의", intro: "검도에 관심 있는 신입 부원을 모집합니다." },
+      { name: "통기타 동아리", field: "음악", time: "금 18:00", place: "동아리방", contact: "인스타 DM", intro: "공연과 버스킹에 관심 있는 학생을 환영합니다." },
+      { name: "창업 동아리", field: "창업", time: "수 17:00", place: "스터디룸", contact: "카카오톡 문의", intro: "아이디어 기획, 발표, 공모전을 함께 준비합니다." }
+    ];
+
+    const defaultRooms = [
+      { building: "A동", room: "302호", purpose: "스터디 가능", until: "16:00까지" },
+      { building: "A동", room: "305호", purpose: "팀플 가능", until: "15:30까지" },
+      { building: "D동", room: "401호", purpose: "조용한 공부", until: "17:00까지" },
+      { building: "F동", room: "201호", purpose: "발표 연습", until: "14:30까지" }
     ];
 
     let tab = "home";
     let map = null;
     let busMarkers = [];
+    let busAnimationFrame = null;
     let estimatedBuses = [];
     let stopArrivals = [];
     let lastUpdated = "-";
     let editIndex = -1;
+    let noticeEditIndex = -1;
+    let clubEditIndex = -1;
+    let roomEditIndex = -1;
     let userLocation = null;
     let aiState = {
       subway: "아직 확인하지 않았습니다.",
@@ -354,6 +504,25 @@
     }
 
     let schedule = loadSchedule();
+
+    function loadList(key, fallback) {
+      const saved = localStorage.getItem(key);
+      if (!saved) return [...fallback];
+
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [...fallback];
+      }
+    }
+
+    let notices = loadList("bufs_notices", defaultNotices);
+    let clubs = loadList("bufs_clubs", defaultClubs);
+    let rooms = loadList("bufs_rooms", defaultRooms);
+
+    function saveList(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
 
     function saveSchedule() {
       localStorage.setItem("bufs_schedule", JSON.stringify(schedule));
@@ -376,12 +545,61 @@
           </div>
         </button>
       `).join("");
+      renderBottomNav();
+    }
+
+
+    function renderBottomNav() {
+      const nav = document.getElementById("bottomNav");
+      if (!nav) return;
+
+      const items = [
+        ["home", "🏠", "홈"],
+        ["bus", "🚌", "버스"],
+        ["timetable", "📅", "시간표"],
+        ["ai", "🤖", "AI"],
+        ["more", "☰", "더보기"]
+      ];
+
+      nav.innerHTML = items.map(item => {
+        const isMoreActive = ["notice", "club", "emptyroom"].includes(tab) && item[0] === "more";
+        const active = tab === item[0] || isMoreActive ? "active" : "";
+        const action = item[0] === "more" ? "toggleMoreMenu()" : `setTab('${item[0]}')`;
+        return `
+          <button class="${active}" onclick="${action}">
+            <span class="nav-icon">${item[1]}</span>
+            <span>${item[2]}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function toggleMoreMenu() {
+      const sheet = document.getElementById("moreSheet");
+      if (!sheet) return;
+      sheet.classList.toggle("open");
+    }
+
+    function closeMoreMenu() {
+      const sheet = document.getElementById("moreSheet");
+      if (sheet) sheet.classList.remove("open");
     }
 
     function setTab(t) {
       tab = t;
       editIndex = -1;
+      noticeEditIndex = -1;
+      clubEditIndex = -1;
+      roomEditIndex = -1;
+      closeMoreMenu();
       render();
+
+      setTimeout(() => {
+        const content = document.getElementById("content");
+        if (content && window.innerWidth <= 900) {
+          content.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 60);
     }
 
     function distance(a, b) {
@@ -395,8 +613,8 @@
       const stopProgress = [0];
       let total = 0;
 
-      for (let i = 0; i < stops.length - 1; i++) {
-        const d = distance(stops[i], stops[i + 1]);
+      for (let i = 0; i < routePath.length - 1; i++) {
+        const d = distance(routePath[i], routePath[i + 1]);
         segs.push(d);
         total += d;
         stopProgress.push(total);
@@ -415,8 +633,8 @@
 
       for (let i = 0; i < segs.length; i++) {
         if (target <= segs[i]) {
-          const a = stops[i];
-          const b = stops[i + 1];
+          const a = routePath[i];
+          const b = routePath[i + 1];
           const t = segs[i] === 0 ? 0 : target / segs[i];
 
           return {
@@ -431,10 +649,10 @@
       }
 
       return {
-        lat: stops[0].lat,
-        lng: stops[0].lng,
-        from: stops[stops.length - 2].name,
-        to: stops[0].name
+        lat: routePath[0].lat,
+        lng: routePath[0].lng,
+        from: routePath[routePath.length - 2].name,
+        to: routePath[0].name
       };
     }
 
@@ -475,14 +693,46 @@
       return buses;
     }
 
-    function getStopArrivals() {
-      const { stopProgress } = routeData();
+    function closestRouteProgress(pos) {
+      const { segs, total } = routeData();
+      let best = { d: Infinity, progress: 0 };
+      let passed = 0;
 
-      return stops.slice(0, -1).map((s, idx) => {
+      for (let i = 0; i < segs.length; i++) {
+        const a = routePath[i];
+        const b = routePath[i + 1];
+        const ax = a.lng * 91000;
+        const ay = a.lat * 111000;
+        const bx = b.lng * 91000;
+        const by = b.lat * 111000;
+        const px = pos.lng * 91000;
+        const py = pos.lat * 111000;
+        const vx = bx - ax;
+        const vy = by - ay;
+        const wx = px - ax;
+        const wy = py - ay;
+        const len2 = vx * vx + vy * vy;
+        const t = len2 ? Math.max(0, Math.min(1, (wx * vx + wy * vy) / len2)) : 0;
+        const qx = ax + vx * t;
+        const qy = ay + vy * t;
+        const d = Math.sqrt((px - qx) ** 2 + (py - qy) ** 2);
+
+        if (d < best.d) {
+          best = { d, progress: total ? (passed + segs[i] * t) / total : 0 };
+        }
+
+        passed += segs[i];
+      }
+
+      return best.progress;
+    }
+
+    function getStopArrivals() {
+      return stops.slice(0, -1).map((s) => {
         if (!estimatedBuses.length) return { ...s, eta: "-" };
 
         let best = Infinity;
-        const target = stopProgress[idx];
+        const target = closestRouteProgress(s);
 
         estimatedBuses.forEach(b => {
           let diff = target - b.progress;
@@ -535,12 +785,13 @@
       const firstEta = stopArrivals[0]?.eta || "-";
       const cls = nextClass();
       const left = minutesUntilClass(cls);
+      const room = rooms[0];
 
       return `
         <div class="hero">
           <div>
             <h2>오늘 캠퍼스 생활 한눈에 보기</h2>
-            <p class="sub">금정3번 위치, 수업 일정, AI 이동 도우미를 빠르게 확인하세요.</p>
+            <p class="sub">금정3번 위치, 수업 일정, 공지사항, 동아리 홍보, 빈 강의실을 빠르게 확인하세요.</p>
           </div>
           <div class="hero-mini">
             <b>AI 이동 도우미</b>
@@ -565,35 +816,38 @@
           </div>
 
           <div class="card">
-            <div style="font-size:30px">🤖</div>
-            <p class="sub">수업까지</p>
-            <h2>${left === null ? "-" : left <= 0 ? "진행 중" : left + "분 남음"}</h2>
-            <p class="sub">AI 동선 추천 가능</p>
+            <div style="font-size:30px">🏫</div>
+            <p class="sub">빈 강의실</p>
+            <h2>${room ? room.building + " " + room.room : "등록 필요"}</h2>
+            <p class="sub">${room ? room.purpose + " · " + room.until : "빈 강의실을 추가해 주세요"}</p>
           </div>
         </div>
 
         <div class="grid2">
           <div class="card">
-            <h2>정류장 도착 예정</h2>
+            <h2>📢 최근 공지</h2>
             <div class="list">
-              ${stopArrivals.slice(0, 4).map((s, i) => `
-                <div class="small row">
-                  <div>📍 <b>${s.name}</b></div>
-                  <span class="arrival">약 ${s.eta}분 후</span>
+              ${notices.slice(0, 4).map(n => `
+                <div class="small">
+                  <span class="pill" style="background:#fef3c7;color:#a16207">${n.category}</span>
+                  <span class="sub" style="margin-left:8px">${n.date || ""}</span>
+                  <div style="margin-top:8px"><b>${n.title}</b></div>
+                  <p class="sub">${n.content}</p>
                 </div>
-              `).join("")}
+              `).join("") || `<div class="small">등록된 공지가 없습니다.</div>`}
             </div>
           </div>
 
           <div class="card">
-            <h2>게시판</h2>
+            <h2>🎓 동아리 홍보</h2>
             <div class="list">
-              ${defaultPosts.slice(0, 4).map(p => `
+              ${clubs.slice(0, 4).map(c => `
                 <div class="small">
-                  <b>${p[1]}</b>
-                  <p class="sub">${p[0]} · 댓글 ${p[2]}개</p>
+                  <b>${c.name}</b>
+                  <p class="sub">${c.field} · ${c.time} · ${c.place}</p>
+                  <p class="sub">${c.intro}</p>
                 </div>
-              `).join("")}
+              `).join("") || `<div class="small">등록된 동아리 홍보가 없습니다.</div>`}
             </div>
           </div>
         </div>
@@ -753,20 +1007,153 @@
       `;
     }
 
-    function boardHTML() {
+    function noticeHTML() {
+      const editing = noticeEditIndex >= 0 ? notices[noticeEditIndex] : { category: "학사", title: "", content: "", date: "" };
+
       return `
         <div class="card">
-          <h2>📢 게시판</h2>
+          <h2>📢 공지사항</h2>
+          <div class="form">
+            <div>
+              <label>분류</label>
+              <select id="noticeCategory">
+                ${["학사", "장학", "취업", "행사", "기타"].map(x => `<option ${editing.category === x ? "selected" : ""}>${x}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label>제목</label>
+              <input id="noticeTitle" placeholder="공지 제목" value="${editing.title || ""}">
+            </div>
+            <div>
+              <label>날짜</label>
+              <input id="noticeDate" placeholder="예: 오늘 / 6월 2일" value="${editing.date || ""}">
+            </div>
+            <div>
+              <label>내용</label>
+              <input id="noticeContent" placeholder="공지 내용을 입력하세요" value="${editing.content || ""}">
+            </div>
+            <button class="primary" onclick="saveNotice()">${noticeEditIndex >= 0 ? "수정" : "추가"}</button>
+          </div>
+
           <div class="list">
-            ${defaultPosts.map(p => `
+            ${notices.map((n, i) => `
               <div class="small row">
                 <div>
-                  <span class="pill" style="background:#fef3c7;color:#a16207">${p[0]}</span>
-                  <div style="margin-top:8px"><b>${p[1]}</b></div>
+                  <span class="pill" style="background:#fef3c7;color:#a16207">${n.category}</span>
+                  <span class="sub" style="margin-left:8px">${n.date || ""}</span>
+                  <div style="margin-top:8px"><b>${n.title}</b></div>
+                  <p class="sub">${n.content}</p>
                 </div>
-                <span class="sub">댓글 ${p[2]}</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="ghost" onclick="editNotice(${i})">수정</button>
+                  <button class="danger" onclick="deleteNotice(${i})">삭제</button>
+                </div>
               </div>
-            `).join("")}
+            `).join("") || `<div class="small">등록된 공지가 없습니다.</div>`}
+          </div>
+        </div>
+      `;
+    }
+
+    function clubHTML() {
+      const editing = clubEditIndex >= 0 ? clubs[clubEditIndex] : { name: "", field: "", time: "", place: "", contact: "", intro: "" };
+
+      return `
+        <div class="card">
+          <h2>🎓 동아리 홍보</h2>
+          <div class="form club">
+            <div>
+              <label>동아리명</label>
+              <input id="clubName" placeholder="예: 외검회" value="${editing.name || ""}">
+            </div>
+            <div>
+              <label>분야</label>
+              <input id="clubField" placeholder="예: 검도" value="${editing.field || ""}">
+            </div>
+            <div>
+              <label>활동 시간</label>
+              <input id="clubTime" placeholder="예: 화/목 19:00" value="${editing.time || ""}">
+            </div>
+            <div>
+              <label>장소</label>
+              <input id="clubPlace" placeholder="예: 체육관" value="${editing.place || ""}">
+            </div>
+            <button class="primary" onclick="saveClub()">${clubEditIndex >= 0 ? "수정" : "추가"}</button>
+          </div>
+
+          <div class="grid2">
+            <div>
+              <label style="font-size:12px;font-weight:900;color:#64748b">문의</label>
+              <input id="clubContact" placeholder="오픈채팅 / 인스타 / 전화번호" value="${editing.contact || ""}">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:900;color:#64748b">소개</label>
+              <input id="clubIntro" placeholder="동아리 소개" value="${editing.intro || ""}">
+            </div>
+          </div>
+
+          <div class="list" style="margin-top:14px">
+            ${clubs.map((c, i) => `
+              <div class="small row">
+                <div>
+                  <b>${c.name}</b>
+                  <p class="sub">${c.field} · ${c.time} · ${c.place}</p>
+                  <p class="sub">${c.intro}</p>
+                  <span class="pill" style="background:#ecfeff;color:#0891b2">${c.contact}</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="ghost" onclick="editClub(${i})">수정</button>
+                  <button class="danger" onclick="deleteClub(${i})">삭제</button>
+                </div>
+              </div>
+            `).join("") || `<div class="small">등록된 동아리 홍보가 없습니다.</div>`}
+          </div>
+        </div>
+      `;
+    }
+
+    function emptyRoomHTML() {
+      const editing = roomEditIndex >= 0 ? rooms[roomEditIndex] : { building: "", room: "", purpose: "", until: "" };
+
+      return `
+        <div class="card">
+          <h2>🏫 빈 강의실</h2>
+          <div class="form room">
+            <div>
+              <label>건물</label>
+              <input id="roomBuilding" placeholder="예: A동" value="${editing.building || ""}">
+            </div>
+            <div>
+              <label>강의실</label>
+              <input id="roomNumber" placeholder="예: 302호" value="${editing.room || ""}">
+            </div>
+            <div>
+              <label>용도</label>
+              <input id="roomPurpose" placeholder="예: 스터디 가능" value="${editing.purpose || ""}">
+            </div>
+            <div>
+              <label>사용 가능 시간</label>
+              <input id="roomUntil" placeholder="예: 16:00까지" value="${editing.until || ""}">
+            </div>
+            <button class="primary" onclick="saveRoom()">${roomEditIndex >= 0 ? "수정" : "추가"}</button>
+          </div>
+
+          <div class="grid2">
+            ${rooms.map((r, i) => `
+              <div class="small">
+                <div class="row">
+                  <div>
+                    <b>${r.building} ${r.room}</b>
+                    <p class="sub">${r.purpose} · ${r.until}</p>
+                  </div>
+                  <span class="arrival">사용 가능</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+                  <button class="ghost" onclick="editRoom(${i})">수정</button>
+                  <button class="danger" onclick="deleteRoom(${i})">삭제</button>
+                </div>
+              </div>
+            `).join("") || `<div class="small">등록된 빈 강의실이 없습니다.</div>`}
           </div>
         </div>
       `;
@@ -784,9 +1171,10 @@
       else if (tab === "bus") html = busHTML();
       else if (tab === "timetable") html = timetableHTML();
       else if (tab === "ai") html = aiHTML();
-      else if (tab === "board") html = boardHTML();
-      else if (tab === "notice") html = simpleHTML("학교 정보", "🏫", ["학사일정", "장학금 공지", "국가근로 공지", "수강신청 일정"]);
-      else html = simpleHTML("주변 정보", "☕", ["남산역 카페", "학교 앞 맛집", "원룸 정보", "알바 정보"]);
+      else if (tab === "notice") html = noticeHTML();
+      else if (tab === "club") html = clubHTML();
+      else if (tab === "emptyroom") html = emptyRoomHTML();
+      else html = homeHTML();
 
       document.getElementById("content").innerHTML = html;
       if (tab === "bus") setTimeout(initMap, 100);
@@ -824,12 +1212,135 @@
       render();
     }
 
+    function saveNotice() {
+      const item = {
+        category: document.getElementById("noticeCategory").value,
+        title: document.getElementById("noticeTitle").value.trim(),
+        date: document.getElementById("noticeDate").value.trim(),
+        content: document.getElementById("noticeContent").value.trim()
+      };
+
+      if (!item.title || !item.content) {
+        alert("공지 제목과 내용을 입력해 주세요.");
+        return;
+      }
+
+      if (noticeEditIndex >= 0) notices[noticeEditIndex] = item;
+      else notices.unshift(item);
+
+      noticeEditIndex = -1;
+      saveList("bufs_notices", notices);
+      render();
+    }
+
+    function editNotice(i) {
+      noticeEditIndex = i;
+      render();
+    }
+
+    function deleteNotice(i) {
+      notices.splice(i, 1);
+      saveList("bufs_notices", notices);
+      render();
+    }
+
+    function saveClub() {
+      const item = {
+        name: document.getElementById("clubName").value.trim(),
+        field: document.getElementById("clubField").value.trim(),
+        time: document.getElementById("clubTime").value.trim(),
+        place: document.getElementById("clubPlace").value.trim(),
+        contact: document.getElementById("clubContact").value.trim(),
+        intro: document.getElementById("clubIntro").value.trim()
+      };
+
+      if (!item.name || !item.field || !item.intro) {
+        alert("동아리명, 분야, 소개는 입력해 주세요.");
+        return;
+      }
+
+      if (clubEditIndex >= 0) clubs[clubEditIndex] = item;
+      else clubs.unshift(item);
+
+      clubEditIndex = -1;
+      saveList("bufs_clubs", clubs);
+      render();
+    }
+
+    function editClub(i) {
+      clubEditIndex = i;
+      render();
+    }
+
+    function deleteClub(i) {
+      clubs.splice(i, 1);
+      saveList("bufs_clubs", clubs);
+      render();
+    }
+
+    function saveRoom() {
+      const item = {
+        building: document.getElementById("roomBuilding").value.trim(),
+        room: document.getElementById("roomNumber").value.trim(),
+        purpose: document.getElementById("roomPurpose").value.trim(),
+        until: document.getElementById("roomUntil").value.trim()
+      };
+
+      if (!item.building || !item.room) {
+        alert("건물과 강의실은 입력해 주세요.");
+        return;
+      }
+
+      if (roomEditIndex >= 0) rooms[roomEditIndex] = item;
+      else rooms.unshift(item);
+
+      roomEditIndex = -1;
+      saveList("bufs_rooms", rooms);
+      render();
+    }
+
+    function editRoom(i) {
+      roomEditIndex = i;
+      render();
+    }
+
+    function deleteRoom(i) {
+      rooms.splice(i, 1);
+      saveList("bufs_rooms", rooms);
+      render();
+    }
+
     function makeIcon(className, html) {
       return L.divIcon({
         className: "",
         html: `<div class="${className}">${html}</div>`,
         iconSize: null,
         iconAnchor: [40, 20]
+      });
+    }
+
+    function makeBusIcon(routeName) {
+      return L.divIcon({
+        className: "",
+        iconSize: [64, 46],
+        iconAnchor: [32, 23],
+        html: `
+          <div class="bus-marker" title="${routeName}">
+            <svg viewBox="0 0 96 64" aria-hidden="true">
+              <rect x="12" y="10" width="72" height="38" rx="11" fill="#facc15" stroke="#111827" stroke-width="4"/>
+              <rect x="20" y="17" width="19" height="13" rx="3" fill="#e0f2fe" stroke="#111827" stroke-width="2"/>
+              <rect x="43" y="17" width="19" height="13" rx="3" fill="#e0f2fe" stroke="#111827" stroke-width="2"/>
+              <rect x="66" y="17" width="10" height="13" rx="3" fill="#e0f2fe" stroke="#111827" stroke-width="2"/>
+              <rect x="20" y="35" width="15" height="5" rx="2" fill="#111827" opacity=".85"/>
+              <rect x="61" y="35" width="15" height="5" rx="2" fill="#111827" opacity=".85"/>
+              <circle cx="28" cy="50" r="7" fill="#111827"/>
+              <circle cx="68" cy="50" r="7" fill="#111827"/>
+              <circle cx="28" cy="50" r="3" fill="#f8fafc"/>
+              <circle cx="68" cy="50" r="3" fill="#f8fafc"/>
+            </svg>
+            <div class="bus-route-label">금정3</div>
+          </div>
+        `
       });
     }
 
@@ -856,14 +1367,20 @@
 
       stops.forEach(s => {
         bounds.push([s.lat, s.lng]);
+        const markerClass = `stop-marker ${s.type || "busstop"}`;
         L.marker([s.lat, s.lng], {
-          icon: makeIcon("stop-marker", `🚏 ${s.name}`)
+          icon: makeIcon(markerClass, s.short || "•")
         }).addTo(map).bindPopup(`<b>${s.name}</b>`);
       });
 
-      L.polyline(stops.map(s => [s.lat, s.lng]), {
-        weight: 5,
-        opacity: 0.65
+      routePath.forEach(p => bounds.push([p.lat, p.lng]));
+
+      L.polyline(routePath.map(s => [s.lat, s.lng]), {
+        color: "#facc15",
+        weight: 7,
+        opacity: 0.82,
+        lineCap: "round",
+        lineJoin: "round"
       }).addTo(map);
 
       busMarkers = [];
@@ -871,20 +1388,44 @@
       estimatedBuses.forEach(b => {
         bounds.push([b.lat, b.lng]);
         const marker = L.marker([b.lat, b.lng], {
-          icon: makeIcon("bus-marker", `🚌 ${b.id}<br><span style="font-size:11px">버스 위치</span>`)
+          icon: makeBusIcon(b.id)
         }).addTo(map).bindPopup(`<b>${b.id}</b><br>${b.from} → ${b.to}`);
         busMarkers.push(marker);
       });
 
       if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] });
       setTimeout(() => map.invalidateSize(), 200);
+      startBusAnimation();
+    }
+
+    function startBusAnimation() {
+      if (busAnimationFrame) cancelAnimationFrame(busAnimationFrame);
+
+      function move() {
+        if (!map || tab !== "bus") {
+          busAnimationFrame = null;
+          return;
+        }
+
+        const liveBuses = getEstimatedBuses();
+
+        liveBuses.forEach((b, i) => {
+          if (!busMarkers[i]) return;
+          busMarkers[i].setLatLng([b.lat, b.lng]);
+          busMarkers[i].setPopupContent(`<b>${b.id}</b><br>${b.from} → ${b.to}`);
+        });
+
+        busAnimationFrame = requestAnimationFrame(move);
+      }
+
+      busAnimationFrame = requestAnimationFrame(move);
     }
 
     function updateEstimatedBus() {
       estimatedBuses = getEstimatedBuses();
       stopArrivals = getStopArrivals();
       lastUpdated = new Date().toLocaleTimeString("ko-KR");
-      if (tab === "bus") setStatus(`버스 위치 갱신됨 · ${lastUpdated}`);
+      if (tab === "bus") setStatus(`버스 위치 갱신됨 · ${lastUpdated} · 자동 갱신 30초`);
       render();
     }
 
@@ -1051,7 +1592,7 @@
     }
 
     updateEstimatedBus();
-    setInterval(updateEstimatedBus, 10000);
+    setInterval(updateEstimatedBus, 30000);
   </script>
 </body>
 </html>
