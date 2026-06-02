@@ -274,6 +274,238 @@
 
     .bottom-nav, .more-sheet { display: none; }
 
+
+    .home-compact-hero {
+      background: #111827;
+      color: white;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .home-compact-hero h2 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    .home-compact-hero .sub { color: #cbd5e1; margin-top: 4px; }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mini-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 3px 9px rgba(15,23,42,.04);
+      min-height: 98px;
+    }
+    .mini-card.yellow {
+      background: #facc15;
+      border-color: #facc15;
+    }
+    .mini-icon { font-size: 22px; margin-bottom: 4px; }
+    .mini-label { font-size: 12px; color: #64748b; font-weight: 800; }
+    .mini-card.yellow .mini-label { color: #3b2f00; }
+    .mini-value {
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      margin-top: 3px;
+      line-height: 1.15;
+    }
+    .mini-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .mini-card.yellow .mini-desc { color: #3b2f00; }
+    .compact-list .small {
+      padding: 11px 12px;
+      border-radius: 15px;
+    }
+    .compact-list h2 {
+      font-size: 19px;
+      margin-bottom: 12px;
+    }
+    .compact-list b { font-size: 14px; }
+    .compact-list .sub { font-size: 12px; margin-top: 4px; }
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .quick-actions button {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+
+    .week-table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      margin-top: 14px;
+    }
+    .week-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .week-table th, .week-table td {
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      padding: 10px;
+      vertical-align: top;
+      height: 72px;
+      font-size: 13px;
+    }
+    .week-table th {
+      background: #f8fafc;
+      font-weight: 950;
+      text-align: center;
+    }
+    .week-table th:first-child,
+    .week-table td:first-child {
+      width: 86px;
+      text-align: center;
+      color: #64748b;
+      font-weight: 900;
+      background: #f8fafc;
+    }
+
+    .week-cell {
+      position: relative;
+      padding: 6px !important;
+    }
+    .week-cell.merged {
+      background: #fffbeb;
+      padding: 0 !important;
+    }
+    .week-cell.covered {
+      background: #fffbeb;
+    }
+    .class-chip.long {
+      height: 100%;
+      min-height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .class-chip {
+      background: #facc15;
+      color: #111827;
+      border-radius: 14px;
+      padding: 8px 9px;
+      font-weight: 900;
+      line-height: 1.35;
+      box-shadow: 0 3px 8px rgba(250,204,21,.25);
+    }
+
+    .class-chip {
+      color: #111827;
+      border-left: 6px solid rgba(17,24,39,.18);
+    }
+    .class-chip.color1 { background:#fef3c7; }
+    .class-chip.color2 { background:#dbeafe; }
+    .class-chip.color3 { background:#dcfce7; }
+    .class-chip.color4 { background:#fce7f3; }
+    .class-chip.color5 { background:#ede9fe; }
+    .class-chip.color6 { background:#ffedd5; }
+    .class-chip.color7 { background:#ccfbf1; }
+    .class-chip.color8 { background:#e0e7ff; }
+
+    .class-chip .meta {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      opacity: .82;
+      margin-top: 3px;
+    }
+    .day-tabs {
+      display: none;
+      gap: 8px;
+      margin: 14px 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .day-tabs button {
+      flex: 0 0 auto;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: 900;
+    }
+    .day-tabs button.active {
+      background: #facc15;
+      border-color: #facc15;
+    }
+    .mobile-day-list {
+      display: none;
+    }
+
+
+    .compact-bus {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 850;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 14px;
+    }
+    .compact-bus-list {
+      gap: 7px;
+    }
+
+
+    .compact-bus {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 850;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 14px;
+    }
+    .compact-bus-list {
+      gap: 7px;
+    }
+    .bus-summary-card .small {
+      padding: 11px 12px;
+      border-radius: 16px;
+    }
+    .bus-summary-card .summary-value {
+      font-size: 18px;
+      font-weight: 950;
+      margin: 4px 0 0;
+      color: #0f172a;
+      line-height: 1.25;
+    }
+    .bus-summary-card .summary-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 900;
+    }
+
     @media (max-width: 900px) {
       .layout { display: block; }
       .side { display: none; }
@@ -345,11 +577,176 @@
       }
     }
 
+
+    .home-compact-hero {
+      background: #111827;
+      color: white;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .home-compact-hero h2 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    .home-compact-hero .sub { color: #cbd5e1; margin-top: 4px; }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mini-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 3px 9px rgba(15,23,42,.04);
+      min-height: 98px;
+    }
+    .mini-card.yellow {
+      background: #facc15;
+      border-color: #facc15;
+    }
+    .mini-icon { font-size: 22px; margin-bottom: 4px; }
+    .mini-label { font-size: 12px; color: #64748b; font-weight: 800; }
+    .mini-card.yellow .mini-label { color: #3b2f00; }
+    .mini-value {
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      margin-top: 3px;
+      line-height: 1.15;
+    }
+    .mini-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .mini-card.yellow .mini-desc { color: #3b2f00; }
+    .compact-list .small {
+      padding: 11px 12px;
+      border-radius: 15px;
+    }
+    .compact-list h2 {
+      font-size: 19px;
+      margin-bottom: 12px;
+    }
+    .compact-list b { font-size: 14px; }
+    .compact-list .sub { font-size: 12px; margin-top: 4px; }
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .quick-actions button {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+
+    .week-table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      margin-top: 14px;
+    }
+    .week-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .week-table th, .week-table td {
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      padding: 10px;
+      vertical-align: top;
+      height: 72px;
+      font-size: 13px;
+    }
+    .week-table th {
+      background: #f8fafc;
+      font-weight: 950;
+      text-align: center;
+    }
+    .week-table th:first-child,
+    .week-table td:first-child {
+      width: 86px;
+      text-align: center;
+      color: #64748b;
+      font-weight: 900;
+      background: #f8fafc;
+    }
+    .class-chip {
+      background: #facc15;
+      color: #111827;
+      border-radius: 14px;
+      padding: 8px 9px;
+      font-weight: 900;
+      line-height: 1.35;
+      box-shadow: 0 3px 8px rgba(250,204,21,.25);
+    }
+    .class-chip .meta {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      opacity: .82;
+      margin-top: 3px;
+    }
+    .day-tabs {
+      display: none;
+      gap: 8px;
+      margin: 14px 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .day-tabs button {
+      flex: 0 0 auto;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: 900;
+    }
+    .day-tabs button.active {
+      background: #facc15;
+      border-color: #facc15;
+    }
+    .mobile-day-list {
+      display: none;
+    }
+
     @media (max-width: 900px) {
       .layout, .bus-layout, .grid2, .grid3, .hero, .form, .form.club, .form.room, .ai-actions { grid-template-columns: 1fr; }
       h1 { font-size: 34px; }
       .row { align-items: flex-start; }
     }
+  
+    /* final timetable color override */
+    .class-chip.color1 { background:#fef3c7 !important; color:#111827 !important; }
+    .class-chip.color2 { background:#dbeafe !important; color:#111827 !important; }
+    .class-chip.color3 { background:#dcfce7 !important; color:#111827 !important; }
+    .class-chip.color4 { background:#fce7f3 !important; color:#111827 !important; }
+    .class-chip.color5 { background:#ede9fe !important; color:#111827 !important; }
+    .class-chip.color6 { background:#ffedd5 !important; color:#111827 !important; }
+    .class-chip.color7 { background:#ccfbf1 !important; color:#111827 !important; }
+    .class-chip.color8 { background:#e0e7ff !important; color:#111827 !important; }
+
   </style>
 </head>
 <body>
@@ -449,10 +846,14 @@
     ];
 
     const defaultSchedule = [
-      { subject: "데이터베이스", time: "09:00 - 10:15", room: "D동 302호", memo: "쿼리 실습" },
-      { subject: "국제마케팅", time: "10:30 - 11:45", room: "A동 505호", memo: "발표 준비" },
-      { subject: "일본어 회화", time: "13:00 - 14:15", room: "F동 201호", memo: "회화 연습" }
+      { day: "월", start: "09:00", end: "10:15", subject: "데이터베이스", room: "D동 302호", memo: "쿼리 실습", time: "09:00 - 10:15" },
+      { day: "화", start: "10:30", end: "11:45", subject: "국제마케팅", room: "A동 505호", memo: "발표 준비", time: "10:30 - 11:45" },
+      { day: "수", start: "13:00", end: "14:15", subject: "일본어 회화", room: "F동 201호", memo: "회화 연습", time: "13:00 - 14:15" }
     ];
+
+    const weekDays = ["월", "화", "수", "목", "금"];
+    const timeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+    let selectedDay = "월";
 
     const defaultNotices = [
       { category: "학사", title: "수강신청 변경 기간 안내", content: "수강신청 변경 기간과 신청 방법을 확인하세요.", date: "오늘" },
@@ -503,7 +904,16 @@
       }
     }
 
-    let schedule = loadSchedule();
+    let schedule = loadSchedule().map(c => {
+      if (!c.day) c.day = "월";
+      if (!c.start || !c.end) {
+        const parts = String(c.time || "").split("-");
+        c.start = (parts[0] || "09:00").trim();
+        c.end = (parts[1] || "10:00").trim();
+      }
+      c.time = `${c.start} - ${c.end}`;
+      return c;
+    });
 
     function loadList(key, fallback) {
       const saved = localStorage.getItem(key);
@@ -752,9 +1162,34 @@
       return Number(m[1]) * 60 + Number(m[2]);
     }
 
+
+    function classStartMinutes(item) {
+      if (!item) return null;
+      return parseStartMinutes(item.start || item.time);
+    }
+
+    function classEndMinutes(item) {
+      if (!item) return null;
+      return parseStartMinutes(item.end || String(item.time || "").split("-")[1]);
+    }
+
+    function currentDayKor() {
+      return ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
+    }
+
+    function getSubjectColor(subject) {
+      const colors = ["color1", "color2", "color3", "color4", "color5", "color6", "color7", "color8"];
+      let hash = 0;
+      const text = String(subject || "");
+      for (let i = 0; i < text.length; i++) {
+        hash += text.charCodeAt(i) * (i + 1);
+      }
+      return colors[Math.abs(hash) % colors.length];
+    }
+
     function minutesUntilClass(item) {
       if (!item) return null;
-      const start = parseStartMinutes(item.time);
+      const start = classStartMinutes(item);
       if (start === null) return null;
 
       const now = new Date();
@@ -768,84 +1203,141 @@
 
       const now = new Date();
       const cur = now.getHours() * 60 + now.getMinutes();
+      const today = currentDayKor();
 
-      const sorted = [...schedule].sort((a, b) => {
-        const aa = parseStartMinutes(a.time) ?? 9999;
-        const bb = parseStartMinutes(b.time) ?? 9999;
-        return aa - bb;
+      const todayClasses = schedule
+        .filter(c => c.day === today)
+        .sort((a, b) => (classStartMinutes(a) ?? 9999) - (classStartMinutes(b) ?? 9999));
+
+      return todayClasses.find(c => {
+        const start = classStartMinutes(c);
+        return start !== null && start >= cur;
+      }) || todayClasses[0] || schedule[0];
+    }
+
+
+    function getNearestBusStop() {
+      if (!stopArrivals.length) return null;
+
+      if (!userLocation) return stopArrivals[0];
+
+      let best = null;
+      stopArrivals.forEach(s => {
+        const d = distance(userLocation, s);
+        if (!best || d < best.distance) {
+          best = { ...s, distance: d };
+        }
       });
 
-      return sorted.find(c => {
-        const start = parseStartMinutes(c.time);
-        return start !== null && start >= cur;
-      }) || sorted[0];
+      return best || stopArrivals[0];
     }
 
     function homeHTML() {
-      const firstEta = stopArrivals[0]?.eta || "-";
+      const nearStop = typeof getNearestBusStop === "function" ? getNearestBusStop() : (stopArrivals[0] || {});
+      const firstEta = nearStop?.eta || "-";
+      const stopName = nearStop?.name || "가까운 정류장";
       const cls = nextClass();
       const left = minutesUntilClass(cls);
-      const room = rooms[0];
+
+      const noticeList = (typeof notices !== "undefined" ? notices : []);
+      const clubList = (typeof clubs !== "undefined" ? clubs : []);
+      const roomList = (typeof rooms !== "undefined" ? rooms : []);
+
+      const noticeCount = noticeList.length || 0;
+      const roomCount = roomList.length || 0;
+      const firstRoom = roomList[0];
+      const firstNotice = noticeList[0];
+      const firstClub = clubList[0];
 
       return `
-        <div class="hero">
+        <div class="home-compact-hero">
           <div>
-            <h2>오늘 캠퍼스 생활 한눈에 보기</h2>
-            <p class="sub">금정3번 위치, 수업 일정, 공지사항, 동아리 홍보, 빈 강의실을 빠르게 확인하세요.</p>
+            <h2>오늘 캠퍼스 요약</h2>
+            <p class="sub">${cls ? cls.subject + " · " + cls.time : "시간표를 추가해 주세요"} / 금정3 ${stopName} 약 ${firstEta}분 후</p>
           </div>
-          <div class="hero-mini">
-            <b>AI 이동 도우미</b>
-            <p class="sub">지하철·버스·수업 시간을 묶어서 동선을 추천합니다.</p>
-            <button class="refresh" onclick="setTab('ai')" style="margin-top:10px">AI 도우미 열기</button>
+          <div class="quick-actions">
+            <button onclick="setTab('bus')">버스 보기</button>
+            <button onclick="setTab('ai')">AI 동선</button>
+            <button onclick="updateNearestStop && updateNearestStop()">내 위치 기준</button>
           </div>
         </div>
 
-        <div class="grid3">
-          <div class="card yellow">
-            <div style="font-size:30px">🚌</div>
-            <p><b>금정3번</b></p>
-            <h2>약 ${firstEta}분 후</h2>
-            <p>범어사역 3번 출구 기준</p>
+        <div class="mini-grid">
+          <div class="mini-card yellow" onclick="setTab('bus')" style="cursor:pointer">
+            <div class="mini-icon">🚌</div>
+            <div class="mini-label">금정3번</div>
+            <div class="mini-value">${firstEta}분</div>
+            <div class="mini-desc">${stopName}</div>
           </div>
 
-          <div class="card">
-            <div style="font-size:30px">📅</div>
-            <p class="sub">다음 수업</p>
-            <h2>${cls ? cls.subject : "수업 없음"}</h2>
-            <p class="sub">${cls ? cls.time + " · " + cls.room : "시간표를 추가해 주세요"}</p>
+          <div class="mini-card" onclick="setTab('timetable')" style="cursor:pointer">
+            <div class="mini-icon">📅</div>
+            <div class="mini-label">다음 수업</div>
+            <div class="mini-value">${left === null ? "-" : left <= 0 ? "진행중" : left + "분"}</div>
+            <div class="mini-desc">${cls ? cls.subject + " · " + cls.room : "수업 없음"}</div>
           </div>
 
-          <div class="card">
-            <div style="font-size:30px">🏫</div>
-            <p class="sub">빈 강의실</p>
-            <h2>${room ? room.building + " " + room.room : "등록 필요"}</h2>
-            <p class="sub">${room ? room.purpose + " · " + room.until : "빈 강의실을 추가해 주세요"}</p>
+          <div class="mini-card" onclick="setTab('notice')" style="cursor:pointer">
+            <div class="mini-icon">📢</div>
+            <div class="mini-label">공지사항</div>
+            <div class="mini-value">${noticeCount}개</div>
+            <div class="mini-desc">${firstNotice ? firstNotice.title : "등록된 공지 없음"}</div>
+          </div>
+
+          <div class="mini-card" onclick="setTab('emptyroom')" style="cursor:pointer">
+            <div class="mini-icon">🏫</div>
+            <div class="mini-label">빈 강의실</div>
+            <div class="mini-value">${roomCount}개</div>
+            <div class="mini-desc">${firstRoom ? firstRoom.building + " " + firstRoom.room : "등록된 강의실 없음"}</div>
           </div>
         </div>
 
         <div class="grid2">
-          <div class="card">
+          <div class="card compact-list">
+            <h2>📍 정류장 도착 예정</h2>
+            <div class="list">
+              ${stopArrivals.slice(0, 3).map((s) => `
+                <div class="small row">
+                  <div><b>${s.name}</b></div>
+                  <span class="arrival">약 ${s.eta}분 후</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card compact-list">
+            <h2>📅 오늘 수업</h2>
+            <div class="list">
+              ${schedule.slice(0, 3).map(c => `
+                <div class="small">
+                  <b>${c.subject}</b>
+                  <p class="sub">${c.day || ""} · ${(c.start || String(c.time).split("-")[0])} - ${(c.end || String(c.time).split("-")[1] || "")} · ${c.room}</p>
+                </div>
+              `).join("") || `<div class="small">시간표를 추가해 주세요.</div>`}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card compact-list">
             <h2>📢 최근 공지</h2>
             <div class="list">
-              ${notices.slice(0, 4).map(n => `
+              ${noticeList.slice(0, 3).map(n => `
                 <div class="small">
-                  <span class="pill" style="background:#fef3c7;color:#a16207">${n.category}</span>
-                  <span class="sub" style="margin-left:8px">${n.date || ""}</span>
-                  <div style="margin-top:8px"><b>${n.title}</b></div>
-                  <p class="sub">${n.content}</p>
+                  <b>${n.title}</b>
+                  <p class="sub">${n.category || "공지"} · ${n.date || ""}</p>
                 </div>
               `).join("") || `<div class="small">등록된 공지가 없습니다.</div>`}
             </div>
           </div>
 
-          <div class="card">
+          <div class="card compact-list">
             <h2>🎓 동아리 홍보</h2>
             <div class="list">
-              ${clubs.slice(0, 4).map(c => `
+              ${clubList.slice(0, 2).map(c => `
                 <div class="small">
                   <b>${c.name}</b>
-                  <p class="sub">${c.field} · ${c.time} · ${c.place}</p>
-                  <p class="sub">${c.intro}</p>
+                  <p class="sub">${c.field || ""} · ${c.time || ""} · ${c.place || ""}</p>
                 </div>
               `).join("") || `<div class="small">등록된 동아리 홍보가 없습니다.</div>`}
             </div>
@@ -855,23 +1347,61 @@
     }
 
     function busHTML() {
+      const nearStop = typeof getNearestBusStop === "function" ? getNearestBusStop() : (stopArrivals[0] || {});
+      const nearStopName = nearStop?.name || "가까운 정류장";
+      const nearStopEta = nearStop?.eta || "-";
+      const firstBus = estimatedBuses[0];
+
       return `
         <div class="bus-layout">
           <div class="card" style="padding:0;overflow:hidden"><div id="map"></div></div>
+
           <div class="list">
-            <div class="card">
+            <div class="card bus-summary-card">
               <h2>금정3번 위치</h2>
-              <h2>🚌 ${estimatedBuses.length ? estimatedBuses.length + "대 표시" : "대기 중"}</h2>
-              <p class="sub">마지막 갱신: ${lastUpdated}</p>
-              <button class="refresh" onclick="updateEstimatedBus()">↻ 위치 갱신</button>
-            </div>
-            <div class="card">
-              <h2>도착 기준</h2>
-              <div class="grid2">
-                <div class="small">⏱️<br><b>${ROUND_MINUTES}분/1바퀴</b></div>
-                <div class="small">🔁<br><b>${HEADWAY_MINUTES}분 간격</b></div>
+
+              <div class="list">
+                <div class="small">
+                  <div class="summary-label">🚌 현재 운행</div>
+                  <div class="summary-value">${estimatedBuses.length ? estimatedBuses.length + "대" : "대기 중"}</div>
+                </div>
+
+                <div class="small">
+                  <div class="summary-label">📍 가까운 정류장</div>
+                  <div class="summary-value">${nearStopName}</div>
+                </div>
+
+                <div class="small">
+                  <div class="summary-label">⏰ 도착 예정</div>
+                  <div class="summary-value">약 ${nearStopEta}분 후</div>
+                </div>
+
+                <div class="small">
+                  <div class="summary-label">🚏 다음 구간</div>
+                  <div class="summary-value">${firstBus ? firstBus.from + " → " + firstBus.to : "-"}</div>
+                </div>
+
+                <div class="small">
+                  <div class="summary-label">🔄 마지막 갱신</div>
+                  <div class="summary-value">${lastUpdated}</div>
+                </div>
               </div>
+
+              <button class="refresh" onclick="updateEstimatedBus()" style="margin-top:14px;width:100%">↻ 위치 갱신</button>
             </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>실시간 운행 차량 (${estimatedBuses.length})</h2>
+          <div class="list compact-bus-list">
+            ${
+              estimatedBuses.map(b => `
+                <div class="small compact-bus" title="${b.from} → ${b.to}">
+                  🚌 ${b.id} | ${b.from} → ${b.to}
+                </div>
+              `).join("") || `<div class="small compact-bus">현재 표시할 차량이 없습니다.</div>`
+            }
           </div>
         </div>
 
@@ -888,62 +1418,171 @@
             }
           </div>
         </div>
-
-        <div class="card">
-          <h2>차량 목록</h2>
-          <div class="list">
-            ${
-              estimatedBuses.map(b => `
-                <div class="small row">
-                  <div>🚌 <b>${b.id}</b><p class="sub">${b.from} → ${b.to} 구간</p></div>
-                  <span class="pill" style="background:#ecfeff;color:#0891b2">운행 중</span>
-                </div>
-              `).join("")
-            }
-          </div>
-        </div>
       `;
     }
 
     function timetableHTML() {
-      const editing = editIndex >= 0 ? schedule[editIndex] : { subject: "", time: "", room: "", memo: "" };
+      const editing = editIndex >= 0 ? schedule[editIndex] : { day: selectedDay, start: "", end: "", subject: "", room: "", memo: "" };
+
+      function overlapsSlot(c, slot) {
+        const slotStart = parseStartMinutes(slot);
+        const slotEnd = slotStart + 60;
+        const start = classStartMinutes(c);
+        const end = classEndMinutes(c);
+        if (slotStart === null || start === null || end === null) return false;
+        return start < slotEnd && end > slotStart;
+      }
+
+      function isFirstSlot(c, slot) {
+        const slotStart = parseStartMinutes(slot);
+        const start = classStartMinutes(c);
+        if (slotStart === null || start === null) return false;
+        return start >= slotStart && start < slotStart + 60;
+      }
+
+      function rowSpanForClass(c, slot) {
+        const slotStart = parseStartMinutes(slot);
+        const end = classEndMinutes(c);
+        if (slotStart === null || end === null) return 1;
+
+        const hours = Math.ceil((end - slotStart) / 60);
+        return Math.max(1, hours);
+      }
+
+      function isCoveredByPrevious(day, slot) {
+        const slotStart = parseStartMinutes(slot);
+        if (slotStart === null) return false;
+
+        return schedule.some(c => {
+          if (c.day !== day) return false;
+          const start = classStartMinutes(c);
+          const end = classEndMinutes(c);
+          if (start === null || end === null) return false;
+
+          const classFirstSlot = Math.floor(start / 60) * 60;
+          return classFirstSlot < slotStart && end > slotStart;
+        });
+      }
+
+      function classForSlot(day, slot) {
+        return schedule.find(c => c.day === day && isFirstSlot(c, slot));
+      }
 
       return `
         <div class="card">
           <h2>📅 학교 시간표</h2>
           <div class="form">
             <div>
+              <label>요일</label>
+              <select id="day">
+                ${weekDays.map(d => `<option ${editing.day === d ? "selected" : ""}>${d}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label>시작</label>
+              <input id="start" type="time" min="08:00" value="${editing.start || ""}">
+            </div>
+            <div>
+              <label>종료</label>
+              <input id="end" type="time" min="08:00" value="${editing.end || ""}">
+            </div>
+            <div>
               <label>수업명</label>
               <input id="subject" placeholder="예: 국제마케팅" value="${editing.subject || ""}">
-            </div>
-            <div>
-              <label>시간</label>
-              <input id="time" placeholder="예: 10:30 - 11:45" value="${editing.time || ""}">
-            </div>
-            <div>
-              <label>강의실</label>
-              <input id="room" placeholder="예: A동 505호" value="${editing.room || ""}">
-            </div>
-            <div>
-              <label>메모</label>
-              <input id="memo" placeholder="예: 발표 준비" value="${editing.memo || ""}">
             </div>
             <button class="primary" onclick="saveClass()">${editIndex >= 0 ? "수정" : "추가"}</button>
           </div>
 
-          <div class="list">
-            ${schedule.map((c, i) => `
-              <div class="small row">
-                <div>
-                  <b>${c.subject}</b>
-                  <p class="sub">${c.time} · ${c.room}${c.memo ? " · " + c.memo : ""}</p>
+          <div class="grid2" style="margin-bottom:14px">
+            <div>
+              <label style="font-size:12px;font-weight:900;color:#64748b">강의실</label>
+              <input id="room" placeholder="예: A동 505호" value="${editing.room || ""}">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:900;color:#64748b">메모</label>
+              <input id="memo" placeholder="예: 발표 준비" value="${editing.memo || ""}">
+            </div>
+          </div>
+
+          <div class="week-table-wrap">
+            <table class="week-table">
+              <thead>
+                <tr>
+                  <th>시간</th>
+                  ${weekDays.map(d => `<th>${d}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${timeSlots.map(slot => `
+                  <tr>
+                    <td>${slot}</td>
+                    ${weekDays.map(day => {
+                      if (isCoveredByPrevious(day, slot)) return "";
+
+                      const c = classForSlot(day, slot);
+                      if (!c) return `<td class="week-cell"></td>`;
+
+                      const span = rowSpanForClass(c, slot);
+                      return `
+                        <td class="week-cell merged" rowspan="${span}">
+                          <div class="class-chip long ${getSubjectColor(c.subject)}">
+                            ${c.subject}
+                            <span class="meta">${c.start}~${c.end}</span>
+                            <span class="meta">${c.room}</span>
+                            ${c.memo ? `<span class="meta">${c.memo}</span>` : ""}
+                          </div>
+                        </td>
+                      `;
+                    }).join("")}
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="day-tabs">
+            ${weekDays.map(d => `<button class="${selectedDay === d ? "active" : ""}" onclick="selectDay('${d}')">${d}</button>`).join("")}
+          </div>
+
+          <div class="mobile-day-list">
+            ${
+              schedule
+                .filter(c => c.day === selectedDay)
+                .sort((a, b) => (classStartMinutes(a) ?? 9999) - (classStartMinutes(b) ?? 9999))
+                .map((c) => {
+                  const realIndex = schedule.indexOf(c);
+                  return `
+                    <div class="small row">
+                      <div>
+                        <b>${c.subject}</b>
+                        <p class="sub">${c.start} - ${c.end} · ${c.room}${c.memo ? " · " + c.memo : ""}</p>
+                      </div>
+                      <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="ghost" onclick="editClass(${realIndex})">수정</button>
+                        <button class="danger" onclick="deleteClass(${realIndex})">삭제</button>
+                      </div>
+                    </div>
+                  `;
+                }).join("") || `<div class="small">${selectedDay}요일 수업이 없습니다.</div>`
+            }
+          </div>
+
+          <div class="card" style="margin-top:16px;padding:14px">
+            <h2 style="font-size:19px">전체 수업 목록</h2>
+            <div class="list">
+              ${schedule.map((c, i) => `
+                <div class="small row">
+                  <div>
+                    <b>${c.day} · ${c.subject}</b>
+                    <p class="sub">${c.start} - ${c.end} · ${c.room}${c.memo ? " · " + c.memo : ""}</p>
+                  </div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="ghost" onclick="editClass(${i})">수정</button>
+                    <button class="danger" onclick="deleteClass(${i})">삭제</button>
+                  </div>
                 </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <button class="ghost" onclick="editClass(${i})">수정</button>
-                  <button class="danger" onclick="deleteClass(${i})">삭제</button>
-                </div>
-              </div>
-            `).join("") || `<div class="small">아직 등록된 수업이 없습니다.</div>`}
+              `).join("") || `<div class="small">아직 등록된 수업이 없습니다.</div>`}
+            </div>
           </div>
         </div>
       `;
@@ -985,7 +1624,7 @@
             <h2>현재 데이터</h2>
             <div class="list">
               <div class="small row"><div>🚌 <b>범어사역 금정3</b></div><span class="arrival">약 ${firstEta}분 후</span></div>
-              <div class="small"><b>다음 수업</b><p class="sub">${cls ? cls.subject + " · " + cls.time + " · " + cls.room : "수업 없음"}</p></div>
+              <div class="small"><b>다음 수업</b><p class="sub">${cls ? cls.subject + " · " + ((cls.day ? cls.day + " · " : "") + (cls.start || cls.time) + (cls.end ? " - " + cls.end : "") + " · " + cls.room) : "수업 없음"}</p></div>
               <div class="small"><b>수업까지</b><p class="sub">${left === null ? "-" : left <= 0 ? "진행 중" : left + "분 남음"}</p></div>
             </div>
           </div>
@@ -1181,23 +1820,51 @@
     }
 
     function saveClass() {
+      const day = document.getElementById("day").value;
+      const start = document.getElementById("start").value.trim();
+      const end = document.getElementById("end").value.trim();
       const subject = document.getElementById("subject").value.trim();
-      const time = document.getElementById("time").value.trim();
       const room = document.getElementById("room").value.trim();
       const memo = document.getElementById("memo").value.trim();
 
-      if (!subject || !time || !room) {
-        alert("수업명, 시간, 강의실은 입력해 주세요.");
+      if (!day || !start || !end || !subject || !room) {
+        alert("요일, 시작, 종료, 수업명, 강의실은 입력해 주세요.");
         return;
       }
 
-      const item = { subject, time, room, memo };
+      const startMin = parseStartMinutes(start);
+      const endMin = parseStartMinutes(end);
+
+      if (startMin < 480 || endMin < 480) {
+        alert("오전 8시 이전 시간은 입력할 수 없습니다.");
+        return;
+      }
+
+      if (endMin <= startMin) {
+        alert("종료 시간은 시작 시간보다 늦어야 합니다.");
+        return;
+      }
+
+      const item = { day, start, end, subject, room, memo, time: `${start} - ${end}` };
 
       if (editIndex >= 0) schedule[editIndex] = item;
       else schedule.push(item);
 
+      schedule.sort((a, b) => {
+        const da = weekDays.indexOf(a.day);
+        const db = weekDays.indexOf(b.day);
+        if (da !== db) return da - db;
+        return (classStartMinutes(a) ?? 9999) - (classStartMinutes(b) ?? 9999);
+      });
+
+      selectedDay = day;
       editIndex = -1;
       saveSchedule();
+      render();
+    }
+
+    function selectDay(d) {
+      selectedDay = d;
       render();
     }
 
